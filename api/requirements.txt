@@ -2,6 +2,7 @@ asgiref
 Django              
 djangorestframework 
 dotenv              
+dj-database-url
 pip                 
 psycopg2-binary     
 python-dotenv      
