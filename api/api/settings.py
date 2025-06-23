@@ -29,7 +29,7 @@ SECRET_KEY = "django-insecure-i!462hkjn9e43ox)u*pe=yw8qnd@v0yjv=$a5a@@=h^@d+%v0_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['agriao.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['agriao.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
