@@ -27,7 +27,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = "django-insecure-i!462hkjn9e43ox)u*pe=yw8qnd@v0yjv=$a5a@@=h^@d+%v0_"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['agriao.onrender.com', 'localhost', '127.0.0.1']
 
