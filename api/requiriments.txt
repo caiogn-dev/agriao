@@ -1,0 +1,10 @@
+asgiref             
+Django              
+djangorestframework 
+dotenv              
+pip                 
+psycopg2-binary     
+python-dotenv      
+sqlparse          
+uvicorn
+gunicorn 
