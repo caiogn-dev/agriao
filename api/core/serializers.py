@@ -35,11 +35,11 @@ class LoginSerializer(serializers.Serializer):
             try:
                 user = CustomUser.objects.get(email=email)
             except CustomUser.DoesNotExist:
-                raise serializers.ValidationError('Invalid email or password.')
+                raise serializers.ValidationError({'non_field_errors': ['Invalid email or password.']})
             if not user.check_password(password):
-                raise serializers.ValidationError('Invalid email or password.')
+                raise serializers.ValidationError({'non_field_errors': ['Invalid email or password.']})
             if not user.is_active:
-                raise serializers.ValidationError('User is inactive.')
+                raise serializers.ValidationError({'non_field_errors': ['User is inactive.']})
             data['user'] = user
             return data
-        raise serializers.ValidationError('Both email and password are required.')
+        raise serializers.ValidationError({'non_field_errors': ['Both email and password are required.']})
