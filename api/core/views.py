@@ -36,3 +36,10 @@ class LogoutView(APIView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response({'message': 'Logout successful.'}, status=status.HTTP_200_OK)
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
