@@ -11,3 +11,4 @@ sqlparse==0.5.3
 typing_extensions==4.14.0
 mercadopago==2.0.9
 python-dotenv==0.21.0
+whitenoise==6.7.0

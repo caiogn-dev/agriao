@@ -8,7 +8,7 @@ from api.models import ProdutoMarmita, Carrinho, ItemCarrinho, Pedido, ItemPedid
 from django.conf import settings
 import mercadopago
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from urllib.parse import quote
@@ -23,6 +23,23 @@ class CriarPagamentoView(LoginRequiredMixin, View):
 
         total = float(carrinho.get_total)
 
+        # Create the Pedido instance first
+        pedido = Pedido.objects.create(
+            usuario=request.user,
+            total=total,
+            status='pendente'
+        )
+        for item in carrinho.itens.all():
+            ItemPedido.objects.create(
+                pedido=pedido,
+                produto=item.produto,
+                quantidade=item.quantidade,
+                preco_unitario=item.produto.preco
+            )
+        
+        # Clear the cart now
+        carrinho.itens.all().delete()
+
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
         expiration_time = datetime.now() + timedelta(minutes=30)
@@ -30,39 +47,35 @@ class CriarPagamentoView(LoginRequiredMixin, View):
 
         payment_data = {
             "transaction_amount": total,
-            "description": "Pedido de Marmitas",
+            "description": f"Pedido #{pedido.id}",
             "payment_method_id": "pix",
             "date_of_expiration": expiration_time_str,
             "payer": {
                 "email": request.user.email,
                 "first_name": request.user.first_name,
                 "last_name": request.user.last_name,
-            }
+            },
+            "notification_url": request.build_absolute_uri(reverse_lazy('webhook_mercadopago')),
         }
 
         payment_response = sdk.payment().create(payment_data)
         payment = payment_response["response"]
 
         if 'point_of_interaction' not in payment:
-            # Handle error, maybe the access token is wrong
+            pedido.status = 'falhou'
+            pedido.save()
             error_message = payment.get('message', 'Erro desconhecido ao criar pagamento.')
             return render(request, 'web/pagamento_erro.html', {'error': error_message})
 
+        # Update the pedido with the payment ID
+        pedido.payment_id = payment['id']
+        pedido.save()
+
         context = {
+            'pedido_id': pedido.id,
             'qr_code_base64': payment['point_of_interaction']['transaction_data']['qr_code_base64'],
             'qr_code': payment['point_of_interaction']['transaction_data']['qr_code'],
             'expiration_time': expiration_time_str
-        }
-        
-        # Store the pending order details in the session
-        request.session['pending_pedido'] = {
-            'payment_id': payment['id'],
-            'total': total,
-            'itens': [{
-                'produto_id': item.produto.id,
-                'quantidade': item.quantidade,
-                'preco_unitario': float(item.produto.preco)
-            } for item in carrinho.itens.all()]
         }
 
         return render(request, 'web/pagamento.html', context)
@@ -147,31 +160,15 @@ class AdicionarAoCarrinhoView(LoginRequiredMixin, View):
         return redirect('carrinho')
 
 class FinalizarPedidoView(LoginRequiredMixin, TemplateView):
-    template_name = 'web/pedido_whatsapp.html' # Changed to the new template
+    template_name = 'web/pedido_whatsapp.html'
 
     def get(self, request, *args, **kwargs):
-        pending_pedido = request.session.get('pending_pedido')
-        if not pending_pedido:
-            return redirect('carrinho')
+        pedido_id = kwargs.get('pedido_id')
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
 
-        pedido = Pedido.objects.create(
-            usuario=request.user, 
-            total=pending_pedido['total'],
-            payment_id=pending_pedido['payment_id']
-        )
-        for item_data in pending_pedido['itens']:
-            produto = get_object_or_404(ProdutoMarmita, id=item_data['produto_id'])
-            ItemPedido.objects.create(
-                pedido=pedido,
-                produto=produto,
-                quantidade=item_data['quantidade'],
-                preco_unitario=item_data['preco_unitario']
-            )
-        
-        # Clear the cart and the session data
-        carrinho = get_object_or_404(Carrinho, usuario=request.user)
-        carrinho.itens.all().delete()
-        del request.session['pending_pedido']
+        if pedido.status != 'pago':
+            # Optional: Add a message to inform the user
+            return redirect('home')
 
         # Prepare WhatsApp message
         itens_str = "\n".join([f"- {item.quantidade}x {item.produto.nome}" for item in pedido.itens.all()])
@@ -214,6 +211,12 @@ class AtualizarCarrinhoView(LoginRequiredMixin, View):
         
         return redirect('carrinho')
 
+class VerificarStatusPedidoView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pedido_id = kwargs.get('pedido_id')
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+        return JsonResponse({'status': pedido.status})
+
 @method_decorator(csrf_exempt, name='dispatch')
 class MercadoPagoWebhookView(View):
     def post(self, request, *args, **kwargs):
@@ -228,12 +231,16 @@ class MercadoPagoWebhookView(View):
 
             if payment['status'] == 'approved':
                 try:
-                    pedido = Pedido.objects.get(payment_id=payment_id)
-                    pedido.status = 'pago'
-                    pedido.save()
-                    # You can add more logic here, like sending a confirmation email
-                except Pedido.DoesNotExist:
-                    # Handle the case where the order is not found
+                    # Use the description to find the Pedido ID
+                    description = payment.get('description', '')
+                    if description.startswith('Pedido #'):
+                        pedido_id = int(description.split('#')[1])
+                        pedido = Pedido.objects.get(id=pedido_id)
+                        pedido.status = 'pago'
+                        pedido.payment_id = payment_id # Save payment_id for reference
+                        pedido.save()
+                except (Pedido.DoesNotExist, ValueError, IndexError):
+                    # Handle cases where the pedido is not found or description is malformed
                     pass
 
         return HttpResponse(status=200)

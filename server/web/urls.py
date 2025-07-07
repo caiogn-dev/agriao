@@ -12,7 +12,8 @@ from .views import (
     RemoverDoCarrinhoView,
     AtualizarCarrinhoView,
     CriarPagamentoView,
-    MercadoPagoWebhookView
+    MercadoPagoWebhookView,
+    VerificarStatusPedidoView
 )
 
 urlpatterns = [
@@ -29,7 +30,8 @@ urlpatterns = [
     path('carrinho/atualizar/<int:item_id>/', AtualizarCarrinhoView.as_view(), name='atualizar_carrinho'),
     
     path('pagamento/', CriarPagamentoView.as_view(), name='criar_pagamento'),
-    path('finalizar-pedido/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
+    path('finalizar-pedido/<int:pedido_id>/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
+    path('verificar-status/<int:pedido_id>/', VerificarStatusPedidoView.as_view(), name='verificar_status_pedido'),
     path('webhook/mercadopago/', MercadoPagoWebhookView.as_view(), name='webhook_mercadopago'),
 
     path('meus-pedidos/', MeusPedidosView.as_view(), name='meus_pedidos'),
