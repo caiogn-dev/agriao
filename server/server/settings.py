@@ -29,7 +29,9 @@ SECRET_KEY = 'django-insecure-tlkh-ov=p#81qxthjd1whw$2l06gh5h9iv#vfwn$q=0)^%#&#s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['agriao-7woe.onrender.com', 'localhost',]
+ALLOWED_HOSTS = ['agriao-7woe.onrender.com', 'localhost', '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com']
 
 
 # Application definition
