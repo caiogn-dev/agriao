@@ -9,11 +9,15 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-import os 
+import os
+import dj_database_url
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -83,10 +87,9 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    )
 }
 
 
@@ -152,5 +155,5 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Mercado Pago
-MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', 'APP_USR-7316192545059360-070700-cd3fbf22a049ab5e3986e8a8cec7ea8a-235180147')
-MERCADO_PAGO_WHATSAPP_NUMBER = os.environ.get('MERCADO_PAGO_WHATSAPP_NUMBER', '5563920014688') # Include country code
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
+MERCADO_PAGO_WHATSAPP_NUMBER = os.environ.get('MERCADO_PAGO_WHATSAPP_NUMBER') # Include country code
