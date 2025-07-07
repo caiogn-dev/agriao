@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido Finalizado - Marmitaria Fitness{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh]">
+  <div class="w-full max-w-lg text-center">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+      
+      <!-- Ícone de Sucesso -->
+      <div class="mx-auto bg-green-100 rounded-full h-24 w-24 flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Pedido Realizado!</h1>
+      <p class="text-gray-600 text-lg">Obrigado pela sua compra.</p>
+
+      <div class="bg-gray-50 rounded-lg p-4 my-6 text-left">
+        <p class="text-gray-700">
+          Seu pedido <span class="font-bold text-red-600">#{{ pedido.id }}</span> foi confirmado.
+        </p>
+        <p class="text-gray-700 mt-1">
+          Valor total: <span class="font-bold">R$ {{ pedido.total|floatformat:2 }}</span>
+        </p>
+        <p class="text-sm text-gray-500 mt-2">
+          Você receberá um e-mail com os detalhes da sua compra em breve.
+        </p>
+      </div>
+
+      <div class="flex justify-center gap-4">
+        <a href="{% url 'home' %}" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-md font-semibold hover:bg-gray-300 transition">
+          Página Inicial
+        </a>
+        <a href="{% url 'meus_pedidos' %}" class="bg-red-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition-transform transform hover:scale-105">
+          Ver Meus Pedidos
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

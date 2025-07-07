@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido Confirmado - Marmitaria Fitness{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center bg-white rounded-lg shadow-lg p-5">
+                <i class="fas fa-check-circle text-primary" style="font-size: 4rem;"></i>
+                <h2 class="text-3xl font-bold text-gray-800 mt-3">Pedido #{{ pedido.id }} Confirmado!</h2>
+                <p class="text-lg text-gray-600">Obrigado por comprar conosco. Seu pedido já está sendo preparado com todo o carinho.</p>
+                
+                <div class="my-4 border-t border-b py-4">
+                    <h4 class="text-xl font-semibold mb-3">Resumo do Pedido</h4>
+                    <ul class="text-left">
+                        {% for item in pedido.itens.all %}
+                            <li class="flex justify-between py-2 border-b">
+                                <span>{{ item.quantidade }}x {{ item.produto.nome }}</span>
+                                <span class="font-medium">R$ {% widthratio item.preco_unitario 1 item.quantidade %}</span>
+                            </li>
+                        {% endfor %}
+                        <li class="flex justify-between py-2 font-bold text-lg">
+                            <span>Total</span>
+                            <span>R$ {{ pedido.total }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <p class="text-gray-600">Clique no botão abaixo para enviar a confirmação para nosso WhatsApp e combinar a entrega.</p>
+                <a href="{{ whatsapp_url }}" class="mt-2 w-full bg-green-500 text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-green-600 transition-transform transform hover:scale-105 block" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Enviar para o WhatsApp
+                </a>
+                
+                <div class="mt-4">
+                    <a href="{% url 'home' %}" class="text-primary hover:underline">Continuar Comprando</a>
+                    <span class="mx-2 text-gray-300">|</span>
+                    <a href="{% url 'meus_pedidos' %}" class="text-gray-600 hover:underline">Ver Meus Pedidos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

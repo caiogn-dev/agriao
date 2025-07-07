@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Conta - Marmitaria Fitness{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh]">
+  <div class="w-full max-w-md">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Crie sua conta</h2>
+      
+      <form method="post" novalidate class="space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% for field in form %}
+          <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+            <input 
+              type="{{ field.field.widget.input_type }}" 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+              required
+            >
+            {% if field.help_text %}
+              <p class="text-xs text-gray-500 mt-1">{{ field.help_text|safe }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+              <div class="text-red-600 text-sm mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+
+        <div>
+          <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-red-700 transition-transform transform hover:scale-105">
+            Criar Conta
+          </button>
+        </div>
+      </form>
+
+      <p class="text-center text-sm text-gray-600 mt-6">
+        Já tem uma conta?
+        <a href="{% url 'login' %}" class="font-medium text-red-600 hover:text-red-500 hover:underline">
+          Entrar
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
