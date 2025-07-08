@@ -18,7 +18,7 @@ urlpatterns = [
     path('carrinho/remover/<int:item_id>/', RemoverDoCarrinhoView.as_view(), name='remover_do_carrinho'),
     path('carrinho/atualizar/<int:item_id>/', AtualizarCarrinhoView.as_view(), name='atualizar_carrinho'),
     
-    path('pagamento/', CriarPagamentoView.as_view(), name='criar_pagamento'),
+    path('pagamento/', CriarPagamentoView.as_view(), name='criar-pagamento'),
     path('finalizar-pedido/<int:pedido_id>/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
     path('verificar-status/<int:pedido_id>/', VerificarStatusPedidoView.as_view(), name='verificar_status_pedido'),
     path('webhook/mercadopago/', MercadoPagoWebhookView.as_view(), name='webhook_mercadopago'),
