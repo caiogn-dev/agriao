@@ -38,7 +38,7 @@
       <div>
         <a href="{% url 'produto_detail' produto.id %}" class="block">
           {% if produto.imagem %}
-            <img src="/imagens/{{ produto.imagem.name  }}" alt="{{ produto.name }}" class="w-full h-48 object-cover">
+            <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-48 object-cover">
           {% else %}
             <img src="/imagens/produtos/padrao.png" class="w-full h-48 object-cover" alt="Imagem padrão">
           {% endif %}

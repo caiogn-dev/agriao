@@ -152,7 +152,7 @@ REST_FRAMEWORK = {
 
 
 LOGIN_REDIRECT_URL = '/'
-
+LOGIN_URL = '/login/'
 AUTHENTICATION_BACKENDS = [
     'api.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',

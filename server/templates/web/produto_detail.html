@@ -8,14 +8,13 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
     
     <!-- Imagem do Produto -->
-    <div>
+    <div class="aspect-[4/3] w-full">
       {% if produto.imagem %}
-        <img src="{{ produto.imagem.url }}" class="w-full h-80 md:h-full object-cover" alt="{{ produto.nome }}">
+        <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-full object-cover">
       {% else %}
-        <img src="{{ MEDIA_URL }}produtos/padrao.png" class="w-full h-80 md:h-full object-cover" alt="Imagem padrão">
+        <img src="/imagens/produtos/padrao.png" class="w-full h-full object-cover" alt="Imagem padrão">
       {% endif %}
     </div>
-
     <!-- Detalhes do Produto -->
     <div class="p-8 md:p-12 flex flex-col justify-center">
       <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ produto.nome }}</h1>
