@@ -3,56 +3,54 @@
 {% block title %}Pagamento PIX - Marmitaria Fitness{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
-            <div class="bg-white rounded-lg shadow-lg p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <h2 class="text-3xl font-bold text-gray-800">Pague com PIX</h2>
-                    <p class="text-gray-500">Este código PIX expira em:</p>
-                    <div id="timer" class="text-3xl font-bold text-red-600">30:00</div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                        <div id="progressBar" class="bg-red-600 h-2.5 rounded-full" style="width: 100%;"></div>
-                    </div>
-                </div>
-                
-                <div class="text-center">
-                    <img src="data:image/png;base64, {{ qr_code_base64 }}" alt="PIX QR Code" class="w-full max-w-xs mx-auto mb-4 border rounded p-2">
-                </div>
-                
-                <hr class="my-4">
-
-                <div class="text-center">
-                    <h4 class="text-lg font-semibold">Ou use o PIX Copia e Cola</h4>
-                    <div class="flex mt-2">
-                        <input type="text" id="pixCode" class="w-full px-3 py-2 border border-gray-300 rounded-l-md" value="{{ qr_code }}" readonly>
-                        <button class="bg-gray-200 px-4 py-2 rounded-r-md" type="button" id="copyButton">
-                            Copiar
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mt-6 text-center bg-primary-50 p-4 rounded-lg border border-primary-200">
-                    <h3 class="text-xl font-bold text-primary-900">Passo Final</h3>
-                    <p class="text-primary-800 my-2">Após realizar o pagamento, clique no botão abaixo para confirmar e finalizar seu pedido.</p>
-                    <a href="{% url 'finalizar_pedido' %}" class="mt-2 w-full bg-primary text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 block">
-                        Já Paguei, Finalizar Pedido
-                    </a>
-                </div>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">Pague com PIX</h2>
+            <p class="text-gray-500 mt-2">Este código expira em:</p>
+            <div id="timer" class="text-2xl font-bold text-red-600">30:00</div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div id="progressBar" class="bg-red-600 h-2.5 rounded-full" style="width: 100%;"></div>
             </div>
+        </div>
+
+        <div class="text-center">
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="PIX QR Code"
+                 class="w-full max-w-xs mx-auto mb-4 border rounded p-2">
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+            <h4 class="text-lg font-semibold">Ou use o PIX Copia e Cola</h4>
+            <div class="flex mt-2">
+                <input type="text" id="pixCode" class="w-full px-3 py-2 border border-gray-300 rounded-l-md"
+                       value="{{ qr_code }}" readonly>
+                <button class="bg-gray-200 px-4 py-2 rounded-r-md" type="button" id="copyButton">
+                    Copiar
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center bg-primary-50 p-4 rounded-lg border border-primary-200">
+            <h3 class="text-xl font-bold text-primary-900">Passo Final</h3>
+            <p class="text-primary-800 my-2">Após o pagamento, clique para confirmar o pedido:</p>
+            <a href="{% url 'finalizar_pedido' %}"
+               class="mt-2 w-full bg-primary text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 block">
+                Já Paguei, Finalizar Pedido
+            </a>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Countdown Timer
+document.addEventListener('DOMContentLoaded', function () {
     const expirationTime = new Date("{{ expiration_time }}").getTime();
     const timerElement = document.getElementById('timer');
     const progressBar = document.getElementById('progressBar');
-    const totalDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
+    const totalDuration = 30 * 60 * 1000;
 
-    const timerInterval = setInterval(function() {
+    const timerInterval = setInterval(function () {
         const now = new Date().getTime();
         const distance = expirationTime - now;
 
@@ -71,13 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 1000);
 
-    // Copy Button
-    document.getElementById('copyButton').addEventListener('click', function() {
+    document.getElementById('copyButton').addEventListener('click', function () {
         const copyText = document.getElementById('pixCode');
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand('copy');
-        
+
         const originalText = this.textContent;
         this.textContent = 'Copiado!';
         this.classList.add('bg-primary', 'text-white');

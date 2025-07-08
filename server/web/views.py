@@ -21,6 +21,8 @@ from django.views import View
 from django.utils.encoding import smart_str
 from django.http import FileResponse
 import mimetypes
+from django.utils.timezone import now
+
 
 
 class MediaListView(View):
@@ -56,7 +58,7 @@ class CriarPagamentoView(LoginRequiredMixin, View):
 
         total = float(carrinho.get_total)
 
-        # Create the Pedido instance first
+        # Cria o pedido
         pedido = Pedido.objects.create(
             usuario=request.user,
             total=total,
@@ -69,14 +71,12 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                 quantidade=item.quantidade,
                 preco_unitario=item.produto.preco
             )
-        
-        # Clear the cart now
         carrinho.itens.all().delete()
 
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-        expiration_time = datetime.now() + timedelta(minutes=30)
-        expiration_time_str = expiration_time.strftime("%Y-%m-%dT%H:%M:%S.000-03:00")
+        expiration_time = now() + timedelta(minutes=30)
+        expiration_time_str = expiration_time.isoformat()
 
         payment_data = {
             "transaction_amount": total,
@@ -92,25 +92,34 @@ class CriarPagamentoView(LoginRequiredMixin, View):
         }
 
         payment_response = sdk.payment().create(payment_data)
-        payment = payment_response["response"]
+        payment = payment_response.get("response", {})
 
-        if 'point_of_interaction' not in payment:
+        if payment_response.get("status") != 201 or 'point_of_interaction' not in payment:
             pedido.status = 'falhou'
             pedido.save()
-            error_message = payment.get('message', 'Erro desconhecido ao criar pagamento.')
+            error_message = payment.get('message', 'Erro ao criar pagamento PIX.')
             return render(request, 'web/pagamento_erro.html', {'error': error_message})
 
-        # Update the pedido with the payment ID
+        try:
+            qr_data = payment['point_of_interaction']['transaction_data']
+            qr_code_base64 = qr_data['qr_code_base64']
+            qr_code = qr_data['qr_code']
+        except KeyError as e:
+            pedido.status = 'falhou'
+            pedido.save()
+            return render(request, 'web/pagamento_erro.html', {
+                'error': f'Dados PIX incompletos: {str(e)}'
+            })
+
         pedido.payment_id = payment['id']
         pedido.save()
 
         context = {
             'pedido_id': pedido.id,
-            'qr_code_base64': payment['point_of_interaction']['transaction_data']['qr_code_base64'],
-            'qr_code': payment['point_of_interaction']['transaction_data']['qr_code'],
-            'expiration_time': expiration_time_str
+            'qr_code_base64': qr_code_base64,
+            'qr_code': qr_code,
+            'expiration_time': expiration_time.isoformat(),
         }
-
         return render(request, 'web/pagamento.html', context)
 
 @method_decorator(csrf_exempt, name='dispatch')

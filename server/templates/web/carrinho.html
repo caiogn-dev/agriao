@@ -12,37 +12,42 @@
       
       <!-- Lista de Itens -->
       <div class="lg:col-span-2">
-        <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 rounded-lg p-4 shadow-sm gap-4">
-          {% if item.produto.imagem %}
-            <img src="/imagens/{{ item.produto.imagem.name }}" alt="{{ item.produto.nome }}" class="w-full sm:w-28 h-40 object-cover rounded-md">
-          {% else %}
-            <img src="/imagens/produtos/padrao.png" alt="Imagem padrão" class="w-full sm:w-28 h-40 object-cover rounded-md">
-          {% endif %}
+        <div class="space-y-4">
+          {% for item in carrinho.itens.all %}
+            <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 rounded-lg p-4 shadow-sm gap-4">
+              {% if item.produto.imagem %}
+                <img src="/imagens/{{ item.produto.imagem.name }}" alt="{{ item.produto.nome }}" class="w-full sm:w-28 h-40 object-cover rounded-md">
+              {% else %}
+                <img src="/imagens/produtos/padrao.png" alt="Imagem padrão" class="w-full sm:w-28 h-40 object-cover rounded-md">
+              {% endif %}
 
-          <div class="flex flex-col sm:flex-row flex-grow sm:items-center sm:justify-between w-full">
-            <!-- Detalhes e formulário -->
-            <div class="flex-1">
-              <h3 class="text-lg font-semibold text-gray-800">{{ item.produto.nome }}</h3>
-              <p class="text-sm text-gray-500">Preço unitário: R$ {{ item.produto.preco|floatformat:2 }}</p>
+              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-4">
+                <div class="flex-grow">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ item.produto.nome }}</h3>
+                  <p class="text-sm text-gray-500">Preço unitário: R$ {{ item.produto.preco|floatformat:2 }}</p>
 
-              <form action="{% url 'atualizar_carrinho' item.id %}" method="post" class="flex items-center mt-2 flex-wrap gap-2">
-                {% csrf_token %}
-                <label for="quantidade-{{item.id}}" class="text-sm text-gray-600">Qtd:</label>
-                <input type="number" name="quantidade" id="quantidade-{{item.id}}" value="{{ item.quantidade }}" min="1"
+                  <form action="{% url 'atualizar_carrinho' item.id %}" method="post" class="flex flex-wrap items-center mt-2 gap-2">
+                    {% csrf_token %}
+                    <label for="quantidade-{{ item.id }}" class="text-sm text-gray-600">Qtd:</label>
+                    <input type="number" name="quantidade" id="quantidade-{{ item.id }}" value="{{ item.quantidade }}" min="1"
                       class="w-16 text-center border border-gray-300 rounded-md">
-                <button type="submit"
-                        class="bg-primary text-white px-3 py-1 rounded-md text-sm hover:bg-primary-950 transition">
-                  Atualizar
-                </button>
-              </form>
-            </div>
+                    <button type="submit"
+                      class="bg-primary text-white px-3 py-1 rounded-md text-sm hover:bg-primary-950 transition">
+                      Atualizar
+                    </button>
+                  </form>
+                </div>
 
-            <!-- Preço total e remover -->
-            <div class="text-right mt-4 sm:mt-0 sm:ml-4">
-              <p class="text-lg font-bold text-gray-800">R$ {{ item.get_total|floatformat:2 }}</p>
-              <a href="{% url 'remover_do_carrinho' item.id %}" class="text-red-500 hover:text-red-700 text-sm mt-1 block transition">Remover</a>
+                <div class="text-right sm:text-left">
+                  <p class="text-lg font-bold text-gray-800">R$ {{ item.get_total|floatformat:2 }}</p>
+                  <a href="{% url 'remover_do_carrinho' item.id %}"
+                    class="text-red-500 hover:text-red-700 text-sm mt-1 block transition">
+                    Remover
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
 
@@ -65,7 +70,8 @@
               <span>R$ {{ carrinho.get_total|floatformat:2 }}</span>
             </div>
           </div>
-          <a href="{% url 'criar-pagamento' %}" class="mt-6 w-full bg-primary text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 block">
+          <a href="{% url 'criar-pagamento' %}"
+            class="mt-6 w-full bg-primary text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 block">
             Ir para Pagamento
           </a>
           <a href="{% url 'home' %}" class="mt-4 w-full text-primary hover:underline transition block">
@@ -78,11 +84,13 @@
   {% else %}
     <div class="flex flex-col items-center justify-center text-center py-12 px-4">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg>
       <h2 class="mt-4 text-2xl font-bold text-gray-800">Seu carrinho está vazio</h2>
       <p class="mt-2 max-w-sm text-gray-500">Parece que você ainda não encontrou o que procurava. Que tal dar uma olhada no nosso cardápio?</p>
-      <a href="{% url 'home' %}" class="mt-6 bg-primary text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105">
+      <a href="{% url 'home' %}"
+        class="mt-6 bg-primary text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105">
         Ver Cardápio
       </a>
     </div>
