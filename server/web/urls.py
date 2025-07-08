@@ -1,20 +1,9 @@
 from django.urls import path
-from .views import (
-    ProdutoListView,
-    ProdutoDetailView,
-    UserLoginView,
-    UserLogoutView,
-    UserRegisterView,
-    CarrinhoView,
-    AdicionarAoCarrinhoView,
-    FinalizarPedidoView,
-    MeusPedidosView,
-    RemoverDoCarrinhoView,
-    AtualizarCarrinhoView,
-    CriarPagamentoView,
-    MercadoPagoWebhookView,
-    VerificarStatusPedidoView
-)
+from django.conf import settings
+from .views import *
+from django.conf.urls.static import static
+from django.views.static import serve
+from django.urls import re_path
 
 urlpatterns = [
     path('', ProdutoListView.as_view(), name='home'),
@@ -35,4 +24,10 @@ urlpatterns = [
     path('webhook/mercadopago/', MercadoPagoWebhookView.as_view(), name='webhook_mercadopago'),
 
     path('meus-pedidos/', MeusPedidosView.as_view(), name='meus_pedidos'),
+    
+    re_path(r'^imagens/(?P<path>.*)$', MediaListView.as_view(), name='media_list'),
+    path('imagens/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

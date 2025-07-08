@@ -38,9 +38,9 @@
       <div>
         <a href="{% url 'produto_detail' produto.id %}" class="block">
           {% if produto.imagem %}
-            <img src="{{ produto.imagem.url }}" class="w-full h-48 object-cover" alt="{{ produto.nome }}">
+            <img src="/imagens/{{ produto.imagem.name  }}" alt="{{ produto.name }}" class="w-full h-48 object-cover">
           {% else %}
-            <img src="{{ MEDIA_URL }}produtos/padrao.png" class="w-full h-48 object-cover" alt="Imagem padrão">
+            <img src="/imagens/produtos/padrao.png" class="w-full h-48 object-cover" alt="Imagem padrão">
           {% endif %}
         </a>
         <div class="p-5">
