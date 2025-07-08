@@ -19,5 +19,5 @@ urlpatterns = [
     path('me/', MeAPIView.as_view(), name='me_api'),
     path('carrinho/', CarrinhoAPIView.as_view(), name='carrinho_api'),
     path('pedidos/', PedidoAPIView.as_view(), name='pedidos_api'),
-    path('finalizar-pedido/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
+    path('finalizar-pedido/', FinalizarPedidoView.as_view(), name='finalizar_pedido-api'),
 ]
