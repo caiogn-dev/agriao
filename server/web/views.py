@@ -78,8 +78,10 @@ class CriarPagamentoView(LoginRequiredMixin, View):
 
         offset = timezone(timedelta(hours=-3))
         expiration_time = datetime.now(offset) + timedelta(minutes=30)
-        expiration_time_str = expiration_time.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
+        # Formato EXATO exigido: '2025-07-08T17:45:00.000-03:00'
+        expiration_time_str = expiration_time.strftime("%Y-%m-%dT%H:%M:%S.000-03:00")
+        # Dados do pagamento PIX
         payment_data = {
             "transaction_amount": total,
             "description": f"Pedido #{pedido.id}",
