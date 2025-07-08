@@ -92,8 +92,8 @@
                     <button type="submit" class="w-full text-left text-gray-600 hover:text-red-600 transition bg-transparent border-none cursor-pointer">Sair</button>
                 </form>
             {% else %}
-                <a href="{% url 'login' %}" class="block text-gray-600 hover:text-red-600 transition">Entrar</a>
-                <a href="{% url 'register' %}" class="block bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition text-center">Cadastrar</a>
+              <a href="{% url 'login' %}" class="text-primary hover:text-primary-700 font-medium transition">Entrar</a>
+              <a href="{% url 'register' %}" class="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-primary-950 transition">Cadastrar</a>
             {% endif %}
         </div>
     </div>
