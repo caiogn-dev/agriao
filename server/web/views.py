@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from urllib.parse import quote
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 from django.conf import settings
 from django.http import FileResponse, Http404
@@ -22,6 +22,7 @@ from django.utils.encoding import smart_str
 from django.http import FileResponse
 import mimetypes
 from django.utils.timezone import now
+
 
 
 
@@ -75,8 +76,9 @@ class CriarPagamentoView(LoginRequiredMixin, View):
 
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-        expiration_time = now() + timedelta(minutes=30)
-        expiration_time_str = expiration_time.isoformat()
+        offset = timezone(timedelta(hours=-3))
+        expiration_time = datetime.now(offset) + timedelta(minutes=30)
+        expiration_time_str = expiration_time.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
         payment_data = {
             "transaction_amount": total,
