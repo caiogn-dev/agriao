@@ -31,7 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com', 'agriao.shop']
+CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com', 'https://agriao.shop']
 
 
 # Application definition
