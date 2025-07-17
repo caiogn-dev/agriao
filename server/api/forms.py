@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import CustomUser
+from .models import User
 from django.contrib.auth import authenticate
 
 class UserRegisterForm(forms.ModelForm):
@@ -8,7 +8,7 @@ class UserRegisterForm(forms.ModelForm):
     password2 = forms.CharField(label='Confirmar senha', widget=forms.PasswordInput)
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ['email', 'first_name', 'last_name']
 
     def clean_password2(self):
