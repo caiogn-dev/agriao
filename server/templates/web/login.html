@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Entrar - Marmitaria Fitness{% endblock %}
+{% block title %}Entrar – Agrião{% endblock %}
 
 {% block content %}
 <div class="flex items-center justify-center min-h-[60vh]">
@@ -10,55 +11,26 @@
 
       <form method="post" novalidate class="space-y-6">
         {% csrf_token %}
-
         {% if form.non_field_errors %}
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
-            {% for error in form.non_field_errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md">
+            {% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
           </div>
         {% endif %}
-
-        <div>
-          <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-          <input
-            type="text"
-            name="{{ form.username.name }}"
-            id="{{ form.username.id_for_label }}"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
-            required
-          >
-          {% if form.username.errors %}
-            <div class="text-red-600 text-sm mt-1">{{ form.username.errors|striptags }}</div>
-          {% endif %}
-        </div>
-
-        <div>
-          <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-          <input
-            type="password"
-            name="{{ form.password.name }}"
-            id="{{ form.password.id_for_label }}"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
-            required
-          >
-          {% if form.password.errors %}
-            <div class="text-red-600 text-sm mt-1">{{ form.password.errors|striptags }}</div>
-          {% endif %}
-        </div>
-
-        <div>
-          <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105">
-            Entrar
-          </button>
-        </div>
+        {% for field in form %}
+          <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+            {{ field }}
+            <small class="text-gray-500">{{ field.help_text }}</small>
+          </div>
+        {% endfor %}
+        <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transform hover:scale-105 transition">
+          Entrar
+        </button>
       </form>
 
       <p class="text-center text-sm text-gray-600 mt-6">
-        Ainda não tem uma conta?
-        <a href="{% url 'register' %}" class="font-medium text-primary hover:text-primary-700 hover:underline">
-          Cadastre-se
-        </a>
+        Ainda não tem conta?
+        <a href="{% url 'register' %}" class="font-medium text-primary hover:text-primary-700 underline">Cadastre-se</a>
       </p>
     </div>
   </div>

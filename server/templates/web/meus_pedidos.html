@@ -29,11 +29,17 @@
             
             <div class="text-right">
               <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full
-                {% if pedido.status == 'pendente' %} bg-yellow-200 text-yellow-800
-                {% elif pedido.status == 'entregue' %} bg-green-200 text-green-800
-                {% else %} bg-gray-200 text-gray-800 {% endif %}">
-                {{ pedido.status|capfirst }}
-              </span>
+              {% if pedido.status == 'pendente' %}
+                bg-yellow-200 text-yellow-800
+              {% elif pedido.status == 'entregue' %}
+                bg-green-200 text-green-800
+              {% elif pedido.status == 'pago' %}
+                bg-blue-200 text-blue-800
+              {% else %}
+                bg-gray-200 text-gray-800
+              {% endif %}">
+              {{ pedido.status|capfirst }}
+            </span>
               <!-- <a href="#" class="ml-4 text-red-600 hover:underline">Ver Detalhes</a> -->
             </div>
 

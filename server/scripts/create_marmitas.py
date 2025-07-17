@@ -11,6 +11,11 @@ django.setup()
 
 # Importa o modelo
 from api.models import ProdutoMarmita
+from django.core.files import File
+
+# Caminho absoluto para imagem padrão
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+imagem_padrao_path = os.path.join(BASE_DIR, 'media/padrao.png')
 
 # Marmitas
 marmitas = [
@@ -48,6 +53,12 @@ for nome, descricao in marmitas:
             'ativo': True
         }
     )
+
+    # Adiciona imagem padrão se o produto foi criado ou não tem imagem
+    if not produto.imagem:
+        with open(imagem_padrao_path, 'rb') as img_file:
+            produto.imagem.save('padrao.png', File(img_file), save=True)
+
     if criado:
         print(f"✅ Criado: {nome}")
     else:

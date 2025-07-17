@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView, TemplateView, View
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from api.forms import UserLoginForm, UserRegisterForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from api.models import ProdutoMarmita, Carrinho, ItemCarrinho, Pedido, ItemPedido
@@ -131,6 +133,7 @@ class ProdutoListView(ListView):
     model = ProdutoMarmita
     template_name = 'web/home.html'
     context_object_name = 'produtos'
+    paginate_by = 5
     queryset = ProdutoMarmita.objects.filter(ativo=True)
 
     def post(self, request, *args, **kwargs):
@@ -165,15 +168,21 @@ class ProdutoDetailView(DetailView):
     template_name = 'web/produto_detail.html'
     context_object_name = 'produto'
 
-class UserLoginView(LoginView):
+class UserLoginView(FormView):
     template_name = 'web/login.html'
+    form_class = UserLoginForm
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return super().form_valid(form)
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('home')
 
 class UserRegisterView(FormView):
     template_name = 'web/register.html'
-    form_class = UserCreationForm
+    form_class = UserRegisterForm
     success_url = reverse_lazy('login')
 
     def form_valid(self, form):

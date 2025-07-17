@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import ProdutoMarmita, Carrinho, ItemCarrinho, Pedido, ItemPedido
-from django.contrib.auth.models import User
+
+User = get_user_model()
 
 class ProdutoMarmitaSerializer(serializers.ModelSerializer):
     imagem_url = serializers.SerializerMethodField()
@@ -48,12 +50,11 @@ class PedidoSerializer(serializers.ModelSerializer):
         read_only_fields = ['usuario', 'criado_em', 'total', 'itens']
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('id', 'email', 'first_name', 'last_name', 'password')
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -61,10 +62,4 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        # We need to ensure the username is unique. Let's use the email as username for simplicity
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
-        return user
+        return User.objects.create_user(**validated_data)

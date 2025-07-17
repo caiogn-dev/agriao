@@ -1,5 +1,5 @@
 from rest_framework import viewsets, generics
-from .models import ProdutoMarmita, Carrinho, Pedido, ItemPedido, ItemCarrinho
+from .models import ProdutoMarmita, Carrinho, Pedido, ItemPedido, ItemCarrinho, CustomUser
 from .serializers import ProdutoMarmitaSerializer, CarrinhoSerializer, UserSerializer, PedidoSerializer
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,7 +16,7 @@ class MeAPIView(APIView):
         return Response(serializer.data)
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 

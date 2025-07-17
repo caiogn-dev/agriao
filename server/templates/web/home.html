@@ -6,12 +6,21 @@
 {% block content %}
 
 <!-- Hero Section -->
-<section class="relative rounded-lg overflow-hidden mb-12">
-  <img src="{% static 'img/banner1.png' %}" class="w-full h-80 object-cover" alt="Banner de marmitas saudáveis">
-  <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center p-4">
-    <h1 class="text-white text-4xl md:text-5xl font-bold mb-4">Sua rotina saudável, nossa entrega diária.</h1>
-    <p class="text-gray-200 text-lg md:text-xl max-w-2xl mb-6">Marmitas fitness deliciosas, preparadas com ingredientes frescos e entregues na sua porta.</p>
-    <a href="#marmitas" class="bg-primary text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105">Ver Cardápio</a>
+<section class="relative rounded-xl overflow-hidden mb-16">
+  <img src="{% static 'img/banner1.png' %}" class="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover object-center" alt="Banner de marmitas saudáveis">
+  <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center px-4">
+    <img src="{% static 'img/logo2.png' %}" alt="Logo Agrião"
+         class="w-24 sm:w-32 md:w-40 lg:w-48 mb-4 drop-shadow-lg transition-transform duration-300 hover:scale-105">
+    <h1 class="text-white text-2xl sm:text-3xl md:text-5xl font-extrabold mb-4 leading-snug max-w-3xl">
+      Sua rotina saudável,<br class="hidden sm:inline"> nossa entrega diária.
+    </h1>
+    <p class="text-gray-200 text-base sm:text-lg md:text-xl max-w-xl mb-6 leading-relaxed">
+      Marmitas fitness deliciosas, preparadas com ingredientes frescos e entregues na sua porta.
+    </p>
+    <a href="#marmitas"
+       class="bg-primary text-white px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-primary-950 hover:shadow-lg transition-all transform hover:scale-105">
+       Ver Cardápio
+    </a>
   </div>
 </section>
 
@@ -34,29 +43,29 @@
   {% if produtos %}
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     {% for produto in produtos %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col justify-between transform hover:-translate-y-2 transition-transform duration-300">
-      <div>
-        <a href="{% url 'produto_detail' produto.id %}" class="block">
-          {% if produto.imagem %}
-            <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-48 object-cover">
-          {% else %}
-            <img src="/imagens/produtos/padrao.png" class="w-full h-48 object-cover" alt="Imagem padrão">
-          {% endif %}
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <a href="{% url 'produto_detail' produto.id %}" class="block">
+        {% if produto.imagem %}
+          <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.nome }}" class="w-full h-48 sm:h-56 md:h-64 object-cover">
+        {% else %}
+          <img src="/imagens/produtos/padrao.png" class="w-full h-48 sm:h-56 md:h-64 object-cover" alt="Imagem padrão">
+        {% endif %}
+      </a>
+      <div class="p-4 flex flex-col h-full">
+        <a href="{% url 'produto_detail' produto.id %}">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2 hover:text-primary transition">
+            {{ produto.nome }}
+          </h3>
         </a>
-        <div class="p-5">
-          <a href="{% url 'produto_detail' produto.id %}" class="block">
-            <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-primary transition">{{ produto.nome }}</h3>
-          </a>
-          <p class="text-gray-600 text-sm mb-4 h-16">{{ produto.descricao|truncatewords:15 }}</p>
-        </div>
-      </div>
-      <div class="p-5 pt-0">
-        <div class="flex justify-between items-center">
-          <span class="text-2xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
+        <p class="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+          {{ produto.descricao }}
+        </p>
+        <div class="flex items-center justify-between mt-4">
+          <span class="text-xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
           <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="quantidade" value="1">
-            <button type="submit" class="bg-primary-50 text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-transform transform hover:scale-110">
+            <button type="submit" class="bg-primary-100 text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-all duration-200 hover:scale-110">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
                 <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
@@ -68,9 +77,20 @@
     </div>
     {% endfor %}
   </div>
+    <!-- Botão Ver Mais -->
+  {% if produtos.has_next %}
+    <div class="flex justify-center mt-8">
+      <a href="?page={{ produtos.next_page_number }}"
+         class="bg-primary text-white px-8 py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-primary-950 hover:shadow-lg transition-all transform hover:scale-105">
+        Ver Mais
+      </a>
+    </div>
+  {% endif %}
+  
   {% else %}
   <p class="text-center text-gray-500 mt-8">Nenhuma marmita disponível no momento.</p>
   {% endif %}
 </section>
+
 
 {% endblock %}
