@@ -10,7 +10,6 @@ python manage.py collectstatic --noinput
 
 # Apply database migrations
 
-python manage.py makemigrations
-python manage.py migrate
+python manage.py migrate --fake-initial --noinput
 
 python scripts/create_marmitas.py
