@@ -43,6 +43,8 @@ class ProdutoMarmita(models.Model):
     descricao = models.TextField()
     kcal = models.PositiveIntegerField()
     proteinas = models.DecimalField(max_digits=6, decimal_places=2)
+    carboidratos = models.DecimalField(max_digits=6, decimal_places=2, default=0)  # Novo campo
+    gorduras = models.DecimalField(max_digits=6, decimal_places=2, default=0)      # Adicione se ainda não existir
     preco = models.DecimalField(max_digits=8, decimal_places=2)
     data_criacao = models.DateTimeField(auto_now_add=True)
     ativo = models.BooleanField(default=True)
