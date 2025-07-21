@@ -5,50 +5,102 @@
 
 {% block content %}
 
-<!-- Hero Section -->
+<!-- Hero Section !-->
 <section class="relative rounded-xl overflow-hidden mb-16">
-  <img src="{% static 'img/banner1.png' %}" class="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover object-center" alt="Banner de marmitas saudáveis">
-  <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center px-4">
+  <!-- Gradiente sutil para melhorar contraste do texto -->
+  <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+  <!-- Imagem de fundo com altura mais adequada para mobile -->
+  <img src="{% static 'img/banner1.png' %}" 
+       class="w-full h-[50vh] min-h-[400px] max-h-[500px] object-cover object-center" 
+       alt="Banner de marmitas saudáveis">
+  
+  <!-- Conteúdo sobreposto com padding melhorado -->
+  <div class="absolute inset-0 z-20 flex flex-col justify-center items-center text-center px-4 py-8 md:py-0">
+    <!-- Logo com tamanho ajustado para mobile -->
     <img src="{% static 'img/logo2.png' %}" alt="Logo Agrião"
-         class="w-24 sm:w-32 md:w-40 lg:w-48 mb-4 drop-shadow-lg transition-transform duration-300 hover:scale-105">
-    <h1 class="text-white text-2xl sm:text-3xl md:text-5xl font-extrabold mb-4 leading-snug max-w-3xl">
-      Sua rotina saudável,<br class="hidden sm:inline"> nossa entrega diária.
+         class="w-20 sm:w-28 md:w-36 mb-4 drop-shadow-lg transition-transform duration-500 hover:scale-105">
+    
+    <!-- Título com tamanhos responsivos e line-height ajustado -->
+    <h1 class="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 md:mb-4 leading-tight max-w-3xl font-futura px-2">
+      Sua rotina saudável,<br class="hidden sm:inline"> nossa entrega diária
     </h1>
-    <p class="text-gray-200 text-base sm:text-lg md:text-xl max-w-xl mb-6 leading-relaxed">
-      Marmitas fitness deliciosas, preparadas com ingredientes frescos e entregues na sua porta.
+    
+    <!-- Subtítulo com margem e tamanho ajustados -->
+    <p class="text-gray-100 text-sm sm:text-base md:text-lg max-w-md md:max-w-xl mb-4 sm:mb-6 leading-relaxed px-2">
+      Marmitas fitness deliciosas, preparadas com ingredientes frescos
     </p>
-    <a href="#marmitas"
-       class="bg-primary text-white px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-primary-950 hover:shadow-lg transition-all transform hover:scale-105">
-       Ver Cardápio
-    </a>
+    
+    <!-- Botão com padding e margem melhorados -->
+    <div class="mt-2 sm:mt-0 px-2 w-full sm:w-auto">
+      <a href="#marmitas"
+         class="inline-block bg-primary text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-base md:text-lg font-semibold hover:bg-primary-950 hover:shadow-xl transition-all transform hover:scale-105 shadow-lg">
+         Ver Cardápio
+      </a>
+    </div>
   </div>
 </section>
 
 <!-- Categorias -->
-<section class="mb-12">
-  <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Nossas Categorias</h2>
-  <div class="flex justify-center flex-wrap gap-4">
-    <a href="#" class="bg-white text-gray-700 px-6 py-2 rounded-full font-medium shadow-sm hover:bg-primary hover:text-white transition">Low Carb</a>
-    <a href="#" class="bg-white text-gray-700 px-6 py-2 rounded-full font-medium shadow-sm hover:bg-primary hover:text-white transition">Vegana</a>
-    <a href="#" class="bg-white text-gray-700 px-6 py-2 rounded-full font-medium shadow-sm hover:bg-primary hover:text-white transition">Proteica</a>
-    <a href="#" class="bg-white text-gray-700 px-6 py-2 rounded-full font-medium shadow-sm hover:bg-primary hover:text-white transition">Sem Glúten</a>
-    <a href="#" class="bg-white text-gray-700 px-6 py-2 rounded-full font-medium shadow-sm hover:bg-primary hover:text-white transition">Sopas</a>
+<section class="mb-16">
+  <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 font-futura">Nossas Categorias</h2>
+  <div class="flex justify-center flex-wrap gap-4 max-w-4xl mx-auto">
+    <a href="#" class="bg-white text-gray-700 px-6 py-3 rounded-xl font-medium shadow-md hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:-translate-y-1">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        Low Carb
+      </div>
+    </a>
+    <a href="#" class="bg-white text-gray-700 px-6 py-3 rounded-xl font-medium shadow-md hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:-translate-y-1">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Vegana
+      </div>
+    </a>
+    <a href="#" class="bg-white text-gray-700 px-6 py-3 rounded-xl font-medium shadow-md hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:-translate-y-1">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Proteica
+      </div>
+    </a>
+    <a href="#" class="bg-white text-gray-700 px-6 py-3 rounded-xl font-medium shadow-md hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:-translate-y-1">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        Sem Glúten
+      </div>
+    </a>
+    <a href="#" class="bg-white text-gray-700 px-6 py-3 rounded-xl font-medium shadow-md hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:-translate-y-1">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 14.828A9.956 9.956 0 015.172 12C3.062 10.891 3 9.519 3 9c0-1.657 3.582-3 8-3s8 1.343 8 3c0 .519-.062 1.891-2.172 3A9.956 9.956 0 0121 14.828M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Sopas
+      </div>
+    </a>
   </div>
 </section>
 
 <!-- Lista de Marmitas -->
 <section id="marmitas">
-  <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Marmitas Fitness</h2>
+  <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 font-futura">Marmitas Fitness</h2>
 
   {% if produtos %}
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     {% for produto in produtos %}
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <a href="{% url 'produto_detail' produto.id %}" class="block">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-all duration-300 hover-scale glass-effect">
+      <a href="{% url 'produto_detail' produto.id %}" class="block overflow-hidden">
         {% if produto.imagem %}
-          <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.nome }}" class="w-full h-48 sm:h-56 md:h-64 object-cover">
+          <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.nome }}" class="w-full h-48 sm:h-56 md:h-64 object-cover transition-transform duration-500 hover:scale-105">
         {% else %}
-          <img src="/imagens/produtos/padrao.png" class="w-full h-48 sm:h-56 md:h-64 object-cover" alt="Imagem padrão">
+          <img src="/imagens/produtos/padrao.png" class="w-full h-48 sm:h-56 md:h-64 object-cover transition-transform duration-500 hover:scale-105" alt="Imagem padrão">
         {% endif %}
       </a>
       <div class="p-4 flex flex-col h-full">
@@ -65,7 +117,7 @@
           <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="quantidade" value="1">
-            <button type="submit" class="bg-primary-100 text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-all duration-200 hover:scale-110">
+            <button type="submit" class="bg-primary-100 text-primary p-3 rounded-full hover:bg-primary hover:text-white transition-all duration-200 hover:scale-110 shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
                 <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
@@ -79,18 +131,23 @@
   </div>
     <!-- Botão Ver Mais -->
   {% if produtos.has_next %}
-    <div class="flex justify-center mt-8">
+    <div class="flex justify-center mt-12">
       <a href="?page={{ produtos.next_page_number }}"
-         class="bg-primary text-white px-8 py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-primary-950 hover:shadow-lg transition-all transform hover:scale-105">
+         class="bg-primary text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-primary-950 hover:shadow-xl transition-all transform hover:scale-105 shadow-lg">
         Ver Mais
       </a>
     </div>
   {% endif %}
   
   {% else %}
-  <p class="text-center text-gray-500 mt-8">Nenhuma marmita disponível no momento.</p>
+  <div class="text-center py-16">
+    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-20 w-20 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h2 class="mt-6 text-2xl font-bold text-gray-800">Nenhuma marmita disponível</h2>
+    <p class="mt-2 text-gray-500 max-w-md mx-auto">Estamos preparando novas opções deliciosas para você. Volte em breve!</p>
+  </div>
   {% endif %}
 </section>
-
 
 {% endblock %}

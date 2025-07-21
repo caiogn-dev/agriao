@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Marmitaria Fitness{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="{% static 'img/logo2.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter + Poppins for futuristic feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,6 +20,7 @@
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              futura: ['Poppins', 'sans-serif'],
             },
             colors: {
               primary: {
@@ -35,6 +37,13 @@
                 '900': '#006A4E',
                 '950': '#00523D'
               },
+            },
+            boxShadow: {
+              'neumorphic': '8px 8px 16px #d9d9d9, -8px -8px 16px #ffffff',
+              'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+            },
+            backdropBlur: {
+              'xs': '2px',
             }
           }
         }
@@ -45,51 +54,77 @@
         opacity: 0;
         transition: opacity 0.5s;
       }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .hover-scale {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .hover-scale:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 106, 78, 0.2);
+      }
     </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased">
 
 <!-- Navbar -->
-<nav class="bg-white shadow-sm sticky top-0 z-50">
+<nav class="bg-white/80 glass-effect shadow-sm sticky top-0 z-50 backdrop-blur-md">
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-3">
             <!-- Logo -->
             <a href="{% url 'home' %}" class="block">
-                <img src="{% static 'img/logo2.png' %}" alt="Marmitaria Logo" class="h-16 w-auto md:h-20">
+                <img src="{% static 'img/logo2.png' %}" alt="Marmitaria Logo" class="h-16 w-auto md:h-20 transition-transform duration-300 hover:scale-105">
             </a>
 
             <!-- Links do Menu (Desktop) -->
             <div class="hidden md:flex items-center space-x-6">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'carrinho' %}" class="text-gray-600 hover:text-primary transition">Carrinho</a>
-                    <a href="{% url 'meus_pedidos' %}" class="text-gray-600 hover:text-primary transition">Meus Pedidos</a>
+                    <a href="{% url 'carrinho' %}" class="text-gray-600 hover:text-primary transition relative group">
+                        Carrinho
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="{% url 'meus_pedidos' %}" class="text-gray-600 hover:text-primary transition relative group">
+                        Meus Pedidos
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
                     <form id="logout-form" method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="text-gray-600 hover:text-primary transition bg-transparent border-none cursor-pointer">Sair</button>
+                        <button type="submit" class="text-gray-600 hover:text-primary transition relative group bg-transparent border-none cursor-pointer">
+                            Sair
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </button>
                     </form>
                 {% else %}
-                  <a href="{% url 'login' %}" class="text-primary hover:text-primary-700 font-medium transition">Entrar</a>
-                  <a href="{% url 'register' %}" class="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-primary-950 transition">Cadastrar</a>
+                  <a href="{% url 'login' %}" class="text-primary hover:text-primary-700 font-medium transition relative group">
+                    Entrar
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </a>
+                  <a href="{% url 'register' %}" class="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-primary-950 transition-all hover:shadow-lg">
+                    Cadastrar
+                  </a>
                 {% endif %}
             </div>
 
             <!-- Botão do Menu (Mobile) -->
             <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-gray-600 hover:text-red-600 focus:outline-none">
+                <button id="mobile-menu-button" class="text-gray-600 hover:text-primary focus:outline-none transition-transform duration-200 hover:scale-110">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </div>
     </div>
     <!-- Menu Mobile -->
-    <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200">
+    <div id="mobile-menu" class="md:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
       <div class="px-4 pt-3 pb-4 space-y-3 text-center">
         {% if user.is_authenticated %}
-          <a href="{% url 'carrinho' %}" class="block text-gray-700 hover:text-primary font-medium transition">Carrinho</a>
-          <a href="{% url 'meus_pedidos' %}" class="block text-gray-700 hover:text-primary font-medium transition">Meus Pedidos</a>
+          <a href="{% url 'carrinho' %}" class="block text-gray-700 hover:text-primary font-medium transition py-2 rounded-md hover:bg-primary-50">Carrinho</a>
+          <a href="{% url 'meus_pedidos' %}" class="block text-gray-700 hover:text-primary font-medium transition py-2 rounded-md hover:bg-primary-50">Meus Pedidos</a>
           <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
-            <button type="submit" class="w-full text-center text-red-500 hover:text-red-700 font-medium transition bg-transparent border-none cursor-pointer">Sair</button>
+            <button type="submit" class="w-full text-center text-red-500 hover:text-red-700 font-medium transition py-2 rounded-md hover:bg-red-50">Sair</button>
           </form>
         {% else %}
           <a href="{% url 'login' %}"
@@ -97,7 +132,7 @@
             Entrar
           </a>
           <a href="{% url 'register' %}"
-            class="block w-full bg-primary text-white font-semibold rounded-md px-4 py-2 transition hover:bg-primary-950">
+            class="block w-full bg-primary text-white font-semibold rounded-md px-4 py-2 transition hover:bg-primary-950 hover:shadow-md">
             Cadastrar
           </a>
         {% endif %}
@@ -109,7 +144,7 @@
     {% block content %}{% endblock %}
 </main>
 
-<footer class="bg-gray-100 border-t">
+<footer class="bg-white/80 glass-effect border-t backdrop-blur-md">
     <div class="container mx-auto px-4 py-6 text-center text-gray-500">
         &copy; {% now "Y" %} Marmitaria. Todos os direitos reservados.
     </div>

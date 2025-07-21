@@ -4,46 +4,87 @@
 {% block title %}{{ produto.nome }} - Marmitaria Fitness{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow-xl overflow-hidden">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
-    
-    <!-- Imagem do Produto -->
-    <div class="aspect-[4/3] w-full">
-      {% if produto.imagem %}
-        <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-full object-cover">
-      {% else %}
-        <img src="/imagens/produtos/padrao.png" class="w-full h-full object-cover" alt="Imagem padrão">
-      {% endif %}
-    </div>
-    <!-- Detalhes do Produto -->
-    <div class="p-8 md:p-12 flex flex-col justify-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">{{ produto.nome }}</h1>
-      <p class="text-gray-600 text-lg mb-6">{{ produto.descricao }}</p>
+<div class="max-w-6xl mx-auto">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden glass-effect">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
       
-      <div class="flex items-baseline mb-8">
-        <span class="text-4xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
+      <!-- Imagem do Produto -->
+      <div class="aspect-[4/3] w-full overflow-hidden">
+        {% if produto.imagem %}
+          <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+        {% else %}
+          <img src="/imagens/produtos/padrao.png" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Imagem padrão">
+        {% endif %}
       </div>
-
-      <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
-        {% csrf_token %}
-        <div class="flex items-center gap-4">
-          <!-- Seletor de Quantidade -->
-          <div class="flex items-center border border-gray-300 rounded-md">
-            <button type="button" id="diminuir-qty" class="text-gray-600 px-4 py-2 hover:bg-gray-100 rounded-l-md transition">-</button>
-            <input type="number" name="quantidade" id="quantidade-input" class="w-16 text-center border-l border-r border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" value="1" min="1">
-            <button type="button" id="aumentar-qty" class="text-gray-600 px-4 py-2 hover:bg-gray-100 rounded-r-md transition">+</button>
-          </div>
-          
-          <!-- Botão Adicionar ao Carrinho -->
-          <button type="submit" class="flex-grow bg-primary text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 flex items-center justify-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
-              <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
-              <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-            </svg>
-            <span>Adicionar</span>
-          </button>
+      
+      <!-- Detalhes do Produto -->
+      <div class="p-8 md:p-12 flex flex-col justify-center">
+        <div class="mb-4">
+          <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800">
+            {{ produto.categoria|default:"Fitness" }}
+          </span>
         </div>
-      </form>
+        
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-futura">{{ produto.nome }}</h1>
+        <p class="text-gray-600 text-lg mb-6">{{ produto.descricao }}</p>
+        
+        <div class="flex items-baseline mb-8 gap-4">
+          <span class="text-4xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
+          <span class="text-sm text-gray-500">+ frete grátis</span>
+        </div>
+
+        <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
+          {% csrf_token %}
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <!-- Seletor de Quantidade -->
+            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+              <button type="button" id="diminuir-qty" class="text-gray-600 px-4 py-3 hover:bg-gray-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                </svg>
+              </button>
+              <input type="number" name="quantidade" id="quantidade-input" class="w-16 text-center border-l border-r border-gray-300 py-3 focus:outline-none focus:ring-2 focus:ring-primary" value="1" min="1">
+              <button type="button" id="aumentar-qty" class="text-gray-600 px-4 py-3 hover:bg-gray-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Botão Adicionar ao Carrinho -->
+            <button type="submit" class="flex-grow bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-950 transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
+                <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z"/>
+                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+              <span>Adicionar ao Carrinho</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Informações Nutricionais -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Informações Nutricionais</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-sm text-gray-500">Calorias</p>
+              <p class="font-bold text-primary">{{ produto.calorias|default:"350" }} kcal</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-sm text-gray-500">Proteínas</p>
+              <p class="font-bold text-primary">{{ produto.proteinas|default:"25" }}g</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-sm text-gray-500">Carboidratos</p>
+              <p class="font-bold text-primary">{{ produto.carboidratos|default:"30" }}g</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-sm text-gray-500">Gorduras</p>
+              <p class="font-bold text-primary">{{ produto.gorduras|default:"10" }}g</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

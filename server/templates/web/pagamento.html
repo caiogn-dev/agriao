@@ -9,7 +9,7 @@
             <h2 class="text-3xl font-bold text-gray-800">Pague com PIX</h2>
             <p class="text-gray-500 mt-2">Este código expira em:</p>
             <div id="timer" class="text-2xl font-bold text-red-600">30:00</div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2 overflow-hidden">
                 <div id="progressBar" class="bg-red-600 h-2.5 rounded-full" style="width: 100%;"></div>
             </div>
         </div>
@@ -26,7 +26,7 @@
             <div class="flex mt-2">
                 <input type="text" id="pixCode" class="w-full px-3 py-2 border border-gray-300 rounded-l-md"
                        value="{{ qr_code }}" readonly>
-                <button class="bg-gray-200 px-4 py-2 rounded-r-md" type="button" id="copyButton">
+                <button class="bg-gray-200 px-4 py-2 rounded-r-md hover:bg-gray-300 transition-colors" type="button" id="copyButton">
                     Copiar
                 </button>
             </div>
@@ -35,7 +35,7 @@
         <div class="mt-6 text-center bg-primary-50 p-4 rounded-lg border border-primary-200">
             <h3 class="text-xl font-bold text-primary-900">Passo Final</h3>
             <p class="text-primary-800 my-2">Após o pagamento, clique para confirmar o pedido:</p>
-            <a href="{% url 'finalizar_pedido' pedido_id %}" class="mt-2 w-full bg-primary text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-950 transition-transform transform hover:scale-105 block">
+            <a href="{% url 'finalizar_pedido' pedido_id %}" class="mt-2 w-full bg-primary-700 text-white text-center px-6 py-3 rounded-md text-lg font-semibold hover:bg-primary-800 transition-colors block">
                 Já Paguei, Finalizar Pedido
             </a>
         </div>
@@ -76,11 +76,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const originalText = this.textContent;
         this.textContent = 'Copiado!';
-        this.classList.add('bg-primary', 'text-white');
+        this.classList.add('bg-primary-700', 'text-white');
 
         setTimeout(() => {
             this.textContent = originalText;
-            this.classList.remove('bg-primary', 'text-white');
+            this.classList.remove('bg-primary-700', 'text-white');
         }, 2000);
     });
 });
