@@ -62,8 +62,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = ['https://agriao-7woe.onrender.com', 'https://agriao.shop']
-
+CORS_ALLOWED_ORIGINS = [
+    'https://agriao-7woe.onrender.com',
+    'https://agriao.shop',
+]
 ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
