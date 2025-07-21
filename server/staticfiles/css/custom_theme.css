@@ -1,0 +1,50 @@
+:root {
+  --primary-green: #006A4E; /* A nice, deep emerald/watercress green */
+  --primary-green-dark: #00523D;
+  --primary-green-light: #E6F0EB;
+  --secondary-color: #495057;
+}
+
+/* Bootstrap Overrides */
+.btn-success {
+  background-color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.btn-success:hover {
+  background-color: var(--primary-green-dark);
+  border-color: var(--primary-green-dark);
+}
+
+.bg-success {
+  background-color: var(--primary-green) !important;
+}
+
+.text-success {
+  color: var(--primary-green) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--primary-green-light) !important;
+    color: var(--primary-green-dark) !important;
+}
+
+.list-group-item.active {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+/* Custom Styles */
+.navbar {
+    border-bottom: 3px solid var(--primary-green);
+}
+
+.btn-primary {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-green-dark);
+    border-color: var(--primary-green-dark);
+}

@@ -64,8 +64,9 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'https://agriao-7woe.onrender.com',
-    'https://agriao.shop',
+    'https://agriao.shop'
 ]
+
 ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
@@ -137,7 +138,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/' # Este será o prefixo da URL para seus arquivos de mídia
+MEDIA_URL = '/imagens/' # Este será o prefixo da URL para seus arquivos de mídia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Onde seus arquivos de mídia estão armazenados fisicamente
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

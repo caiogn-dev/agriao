@@ -3,6 +3,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, User
 from django.db import models
 from django.conf import settings
+from django.templatetags.static import static
+import os
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -45,6 +47,15 @@ class ProdutoMarmita(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     ativo = models.BooleanField(default=True)
     imagem = models.ImageField(upload_to='produtos/', blank=True, null=True)
+
+    @property
+    def imagem_url_segura(self):
+        try:
+            if self.imagem and os.path.exists(self.imagem.path):
+                return self.imagem.url
+        except Exception:
+            pass
+        return static('img/padrao.png')
 
     def __str__(self):
         return self.nome

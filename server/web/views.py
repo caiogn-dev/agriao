@@ -134,7 +134,7 @@ class ProdutoListView(ListView):
     template_name = 'web/home.html'
     context_object_name = 'produtos'
     paginate_by = 5
-    queryset = ProdutoMarmita.objects.filter(ativo=True)
+    queryset = ProdutoMarmita.objects.filter(ativo=True).order_by('-id')
 
     def post(self, request, *args, **kwargs):
         # This is a workaround for the webhook being sent to the wrong URL.
