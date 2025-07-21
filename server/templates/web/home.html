@@ -96,25 +96,25 @@
   {% if produtos %}
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     {% for produto in produtos %}
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-all duration-300 hover-scale glass-effect">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col justify-between transition-all duration-300 hover-scale glass-effect h-full max-h-[420px] sm:max-h-none">
       <a href="{% url 'produto_detail' produto.id %}" class="block overflow-hidden">
         {% if produto.imagem %}
-          <img src="{{ produto.imagem_url_segura }}" alt="{{ produto.nome }}" ...>
+          <img src="{{ produto.imagem_url_segura }}" alt="{{ produto.nome }}" class="w-full h-32 sm:h-48 md:h-56 object-cover transition-transform duration-500 hover:scale-105">
         {% else %}
-          <img src="{% static 'img/padrao.png' %}" alt="Imagem padrão" ...>
+          <img src="{% static 'img/padrao.png' %}" alt="Imagem padrão" class="w-full h-32 sm:h-48 md:h-56 object-cover transition-transform duration-500 hover:scale-105">
         {% endif %}
       </a>
       <div class="p-4 flex flex-col h-full">
         <a href="{% url 'produto_detail' produto.id %}">
-          <h3 class="text-lg font-semibold text-gray-800 mb-2 hover:text-primary transition">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2 hover:text-primary transition">
             {{ produto.nome }}
           </h3>
         </a>
-        <p class="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+        <p class="text-gray-600 text-xs sm:text-sm mb-4 line-clamp-3 flex-grow">
           {{ produto.descricao }}
         </p>
         <div class="flex items-center justify-between mt-4">
-          <span class="text-xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
+          <span class="text-lg sm:text-xl font-bold text-primary">R$ {{ produto.preco|floatformat:2 }}</span>
           <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="quantidade" value="1">
