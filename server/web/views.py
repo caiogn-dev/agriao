@@ -27,6 +27,7 @@ from django.http import FileResponse
 import mimetypes
 from django.utils.timezone import now
 import logging
+from django.contrib import messages
 
 
 class MediaListView(View):
@@ -63,12 +64,14 @@ class CriarPagamentoView(LoginRequiredMixin, View):
             # 1. Validação do carrinho
             carrinho = get_object_or_404(Carrinho, usuario=request.user)
             if not carrinho.itens.exists():
+                messages.warning(request, "Seu carrinho está vazio")
                 return redirect('carrinho')
 
             # 2. Criação do pedido
+            total = float(carrinho.get_total)
             pedido = Pedido.objects.create(
                 usuario=request.user,
-                total=float(carrinho.get_total),
+                total=total,
                 status='pendente'
             )
             
@@ -79,21 +82,22 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                     quantidade=item.quantidade,
                     preco_unitario=item.produto.preco
                 )
+            carrinho.itens.all().delete()
 
             # 3. Configuração do Mercado Pago
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             
-            # Construção das URLs absolutas
-            base_url = request.build_absolute_uri('/')[:-1]  # Remove a barra final
+            # Construção das URLs
+            base_url = request.build_absolute_uri('/')[:-1]
             success_url = f"{base_url}{reverse('pagamento_sucesso')}"
             failure_url = f"{base_url}{reverse('pagamento_falha')}"
             pending_url = f"{base_url}{reverse('pagamento_pendente')}"
             notification_url = f"{base_url}{reverse('webhook_mercadopago')}"
 
-            # 4. Preparação dos itens
+            # 4. Itens do pedido
             items = [{
                 "id": str(item.produto.id),
-                "title": item.produto.nome[:127],  # Limita a 127 caracteres
+                "title": item.produto.nome[:127],
                 "quantity": int(item.quantidade),
                 "currency_id": "BRL",
                 "unit_price": float(item.produto.preco)
@@ -115,17 +119,14 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                 "auto_return": "all",
                 "external_reference": str(pedido.id),
                 "notification_url": notification_url,
-                "statement_descriptor": "MARMITARIA",  # Nome que aparece na fatura (13 chars max)
-                "binary_mode": True,  # Evita pagamentos pendentes
+                "binary_mode": True,
             }
-
-            logger.info(f"Enviando para MP: {preference_data}")
 
             # 6. Criação da preferência
             preference_response = sdk.preference().create(preference_data)
             
             if preference_response['status'] not in [200, 201]:
-                error_msg = preference_response.get('response', {}).get('message', 'Erro desconhecido no Mercado Pago')
+                error_msg = preference_response.get('response', {}).get('message', 'Erro no Mercado Pago')
                 logger.error(f"Erro MP: {error_msg}")
                 raise Exception(error_msg)
 
@@ -133,7 +134,7 @@ class CriarPagamentoView(LoginRequiredMixin, View):
             pedido.preference_id = preference['id']
             pedido.save()
 
-            # 7. Redirecionamento seguro
+            # 7. Redirecionamento
             init_point = preference.get('sandbox_init_point' if settings.DEBUG else 'init_point')
             if not init_point:
                 raise Exception("URL de pagamento não gerada")
@@ -143,16 +144,17 @@ class CriarPagamentoView(LoginRequiredMixin, View):
         except Exception as e:
             logger.error(f"Erro no pagamento: {str(e)}", exc_info=True)
             
-            # Limpeza em caso de erro
             if 'pedido' in locals():
                 pedido.status = 'falhou'
                 pedido.save()
             
-            messages.error(request, f"Não foi possível gerar o pagamento: {str(e)}")
+            messages.error(request, f"Erro ao processar pagamento: {str(e)}")
             return render(request, 'web/pagamento_erro.html', {
                 'error': str(e),
                 'pedido_id': pedido.id if 'pedido' in locals() else None
             })
+
+
 class ProdutoDetailView(DetailView):
     model = ProdutoMarmita
     template_name = 'web/produto_detail.html'
