@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Pedido #{{ pedido.id }} – Status{% endblock %}
+
+{% block content %}
+<div class="glass-effect bg-white rounded-lg p-6 shadow-md mb-8">
+  <h1 class="text-2xl font-futura font-bold mb-4">Pedido #{{ pedido.id }}</h1>
+
+  <p class="mb-4">
+    <span class="font-medium">Status atual:</span>
+    <span class="inline-block 
+      {% if pedido.status == 'pendente' %}bg-yellow-100 text-yellow-800
+      {% elif pedido.status == 'falhou' %}bg-red-100 text-red-800
+      {% else %}bg-gray-100 text-gray-800
+      {% endif %}
+      px-3 py-1 rounded-full text-sm font-medium">
+      {{ pedido.status|capfirst }}
+    </span>
+  </p>
+
+  <h2 class="text-lg font-semibold mb-2">Itens do pedido</h2>
+  <ul class="list-disc pl-5 mb-4">
+    {% for item in pedido.itens.all %}
+      <li class="mb-1">{{ item.quantidade }}× {{ item.produto.nome }} — R$ {{ item.preco_unitario }}</li>
+    {% endfor %}
+  </ul>
+
+  <p class="font-medium mb-6">Total: R$ {{ pedido.total }}</p>
+
+  <div>
+    {% if pedido.status == 'pendente' %}
+      <!-- Se ainda pendente, volta para a view que redireciona para pagamento -->
+      <a href="{% url 'detalhes_pedido' pedido_id=pedido.id %}"
+         class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition">
+        Finalizar Pagamento
+      </a>
+    {% else %}
+      <!-- Para outros casos, volta pra lista de pedidos -->
+      <a href="{% url 'meus_pedidos' %}"
+         class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-950 transition">
+        Meus Pedidos
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

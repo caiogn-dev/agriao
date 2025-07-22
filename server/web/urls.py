@@ -29,6 +29,7 @@ urlpatterns = [
     path('webhook/mercadopago/', mercado_pago_webhook, name='webhook_mercadopago'),
 
     path('meus-pedidos/', MeusPedidosView.as_view(), name='meus_pedidos'),
+    path('pedido/<int:pedido_id>/detalhes/', DetalhesPedidoView.as_view(), name='detalhes_pedido'),
     
     re_path(r'^imagens/(?P<path>.*)$', MediaListView.as_view(), name='media_list'),
     path('imagens/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),

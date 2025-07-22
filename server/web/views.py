@@ -202,27 +202,6 @@ class AdicionarAoCarrinhoView(LoginRequiredMixin, View):
         
         return redirect('carrinho')
 
-class FinalizarPedidoView(LoginRequiredMixin, TemplateView):
-    template_name = 'web/pedido_whatsapp.html'
-
-    def get(self, request, *args, **kwargs):
-        pedido_id = kwargs.get('pedido_id')
-        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
-
-        if pedido.status != 'pago':
-            # Optional: Add a message to inform the user
-            return redirect('home')
-
-        # Prepare WhatsApp message
-        itens_str = "\n".join([f"- {item.quantidade}x {item.produto.nome}" for item in pedido.itens.all()])
-        raw_message = f"Olá! Gostaria de confirmar meu pedido #{pedido.id}:\n\n{itens_str}\n\nTotal: R$ {pedido.total}"
-        whatsapp_message = quote(raw_message)
-        
-        context = {
-            'pedido': pedido,
-            'whatsapp_url': f"https://wa.me/{settings.MERCADO_PAGO_WHATSAPP_NUMBER}?text={whatsapp_message}"
-        }
-        return self.render_to_response(context)
 
 class MeusPedidosView(LoginRequiredMixin, ListView):
     model = Pedido
@@ -446,3 +425,42 @@ def mercado_pago_webhook(request):
     finally:
         # 7) Sempre responde 200 para não ficar em loop de tentativas
         return HttpResponse("OK", status=200)
+    
+
+## VIEW PARA PEDIDOS DETALHADOS ## 
+class DetalhesPedidoView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pedido_id = kwargs.get('pedido_id')
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+
+        # 1) Se estiver pendente, manda pra página de pendente
+        if pedido.status == 'pendente':
+            url = reverse('pagamento_pendente')
+            return redirect(f"{url}?external_reference={pedido.id}")
+
+        # 2) Se aprovado ou pago, mostra o template de WhatsApp
+        if pedido.status in ('aprovado', 'pago'):
+            itens_str = "\n".join(
+                f"- {item.quantidade}x {item.produto.nome}" for item in pedido.itens.all()
+            )
+            raw_message = (
+                f"Olá! Gostaria de confirmar meu pedido #{pedido.id}:\n\n"
+                f"{itens_str}\n\nTotal: R$ {pedido.total}"
+            )
+            context = {
+                'pedido': pedido,
+                'whatsapp_url': (
+                    f"https://wa.me/{settings.MERCADO_PAGO_WHATSAPP_NUMBER}"
+                    f"?text={quote(raw_message)}"
+                )
+            }
+            return render(request, 'web/pedido_whatsapp.html', context)
+
+        # 3) Falha
+        if pedido.status in ('falhou', 'rejected', 'cancelado'):
+            url = reverse('pagamento_falha')
+            return redirect(f"{url}?external_reference={pedido.id}")
+
+        # 4) Qualquer outro status (p.ex. em_mediacao)
+        messages.info(request, f"Status do pedido: {pedido.status}.")
+        return render(request, 'web/pedido_status.html', {'pedido': pedido})
