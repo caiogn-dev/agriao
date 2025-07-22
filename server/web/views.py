@@ -28,108 +28,6 @@ import mimetypes
 from django.utils.timezone import now
 
 
-class PagamentoSucessoView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        # O external_reference é geralmente passado como parâmetro na URL de retorno
-        pedido_id = request.GET.get('external_reference')
-        if not pedido_id:
-            return redirect('home')
-        
-        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
-        
-        # Atualiza o status do pedido se necessário
-        if pedido.status == 'pendente':
-            pedido.status = 'aprovado'
-            pedido.save()
-        
-        return render(request, 'web/pagamento_sucesso.html', {'pedido': pedido})
-
-class PagamentoFalhaView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        pedido_id = request.GET.get('external_reference')
-        if not pedido_id:
-            return redirect('home')
-        
-        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
-        
-        # Atualiza o status do pedido
-        if pedido.status == 'pendente':
-            pedido.status = 'falhou'
-            pedido.save()
-        
-        return render(request, 'web/pagamento_falha.html', {'pedido': pedido})
-
-class PagamentoPendenteView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        pedido_id = request.GET.get('external_reference')
-        if not pedido_id:
-            return redirect('home')
-        
-        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
-        
-        # Mantém como pendente (ou pode criar um status específico)
-        if pedido.status == 'pendente':
-            pedido.save()
-        
-        return render(request, 'web/pagamento_pendente.html', {'pedido': pedido})
-
-
-@csrf_exempt
-def webhook_mercadopago(request):
-    if request.method != 'POST':
-        return HttpResponse(status=405)  # Method Not Allowed
-    
-    try:
-        data = json.loads(request.body)
-        payment_id = data.get('data', {}).get('id')
-        
-        if not payment_id:
-            return HttpResponse(status=400)  # Bad Request
-        
-        # Aqui você deve buscar a preferência/pagamento na API do Mercado Pago
-        # para verificar os dados reais e atualizar seu sistema
-        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-        payment_info = sdk.payment().get(payment_id)
-        
-        if payment_info['status'] != 200:
-            return HttpResponse(status=400)
-        
-        payment = payment_info['response']
-        pedido_id = payment.get('external_reference')
-        
-        if not pedido_id:
-            return HttpResponse(status=400)
-        
-        pedido = Pedido.objects.get(id=pedido_id)
-        
-        # Atualiza o status do pedido baseado no status do pagamento
-        status_map = {
-            'approved': 'aprovado',
-            'pending': 'pendente',
-            'in_process': 'processando',
-            'rejected': 'falhou',
-            'refunded': 'reembolsado',
-            'cancelled': 'cancelado',
-            'in_mediation': 'em_mediacao',
-            'charged_back': 'estornado'
-        }
-        
-        new_status = status_map.get(payment['status'], 'pendente')
-        pedido.status = new_status
-        pedido.payment_id = payment_id
-        pedido.data_atualizacao = datetime.now()
-        pedido.save()
-        
-        return HttpResponse(status=200)
-    
-    except Exception as e:
-        # Logar o erro para debug
-        print(f"Erro no webhook: {str(e)}")
-        return HttpResponse(status=500)
-
-
-
-
 class MediaListView(View):
     def get(self, request, path=''):
         abs_path = os.path.join(settings.MEDIA_ROOT, path)
@@ -425,3 +323,104 @@ class ProdutoListView(BuscaMarmitasView):
             pass
 
         return HttpResponse(status=200)
+    
+
+
+class PagamentoSucessoView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        # O external_reference é geralmente passado como parâmetro na URL de retorno
+        pedido_id = request.GET.get('external_reference')
+        if not pedido_id:
+            return redirect('home')
+        
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+        
+        # Atualiza o status do pedido se necessário
+        if pedido.status == 'pendente':
+            pedido.status = 'aprovado'
+            pedido.save()
+        
+        return render(request, 'web/pagamento_sucesso.html', {'pedido': pedido})
+
+class PagamentoFalhaView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pedido_id = request.GET.get('external_reference')
+        if not pedido_id:
+            return redirect('home')
+        
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+        
+        # Atualiza o status do pedido
+        if pedido.status == 'pendente':
+            pedido.status = 'falhou'
+            pedido.save()
+        
+        return render(request, 'web/pagamento_falha.html', {'pedido': pedido})
+
+class PagamentoPendenteView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pedido_id = request.GET.get('external_reference')
+        if not pedido_id:
+            return redirect('home')
+        
+        pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
+        
+        # Mantém como pendente (ou pode criar um status específico)
+        if pedido.status == 'pendente':
+            pedido.save()
+        
+        return render(request, 'web/pagamento_pendente.html', {'pedido': pedido})
+
+
+@csrf_exempt
+def webhook_mercadopago(request):
+    if request.method != 'POST':
+        return HttpResponse(status=405)  # Method Not Allowed
+    
+    try:
+        data = json.loads(request.body)
+        payment_id = data.get('data', {}).get('id')
+        
+        if not payment_id:
+            return HttpResponse(status=400)  # Bad Request
+        
+        # Aqui você deve buscar a preferência/pagamento na API do Mercado Pago
+        # para verificar os dados reais e atualizar seu sistema
+        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+        payment_info = sdk.payment().get(payment_id)
+        
+        if payment_info['status'] != 200:
+            return HttpResponse(status=400)
+        
+        payment = payment_info['response']
+        pedido_id = payment.get('external_reference')
+        
+        if not pedido_id:
+            return HttpResponse(status=400)
+        
+        pedido = Pedido.objects.get(id=pedido_id)
+        
+        # Atualiza o status do pedido baseado no status do pagamento
+        status_map = {
+            'approved': 'aprovado',
+            'pending': 'pendente',
+            'in_process': 'processando',
+            'rejected': 'falhou',
+            'refunded': 'reembolsado',
+            'cancelled': 'cancelado',
+            'in_mediation': 'em_mediacao',
+            'charged_back': 'estornado'
+        }
+        
+        new_status = status_map.get(payment['status'], 'pendente')
+        pedido.status = new_status
+        pedido.payment_id = payment_id
+        pedido.data_atualizacao = datetime.now()
+        pedido.save()
+        
+        return HttpResponse(status=200)
+    
+    except Exception as e:
+        # Logar o erro para debug
+        print(f"Erro no webhook: {str(e)}")
+        return HttpResponse(status=500)

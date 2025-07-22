@@ -18,7 +18,12 @@ urlpatterns = [
     path('carrinho/remover/<int:item_id>/', RemoverDoCarrinhoView.as_view(), name='remover_do_carrinho'),
     path('carrinho/atualizar/<int:item_id>/', AtualizarCarrinhoView.as_view(), name='atualizar_carrinho'),
     
-    path('pagamento/', CriarPagamentoView.as_view(), name='criar-pagamento'),
+    # URLs de pagamento (atualizadas)
+    path('pagamento/', CriarPagamentoView.as_view(), name='criar_pagamento'),  # Mudei o nome para criar_pagamento (padrão Django)
+    path('pagamento/sucesso/', PagamentoSucessoView.as_view(), name='pagamento_sucesso'),
+    path('pagamento/falha/', PagamentoFalhaView.as_view(), name='pagamento_falha'),
+    path('pagamento/pendente/', PagamentoPendenteView.as_view(), name='pagamento_pendente'),
+    
     path('finalizar-pedido/<int:pedido_id>/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
     path('verificar-status/<int:pedido_id>/', VerificarStatusPedidoView.as_view(), name='verificar_status_pedido'),
     path('webhook/mercadopago/', MercadoPagoWebhookView.as_view(), name='webhook_mercadopago'),
@@ -30,7 +35,6 @@ urlpatterns = [
 
     path('buscar/', BuscaMarmitasView.as_view(), name='busca_marmitas'),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
