@@ -166,3 +166,4 @@ AUTHENTICATION_BACKENDS = [
 # Mercado Pago
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_WHATSAPP_NUMBER = os.environ.get('MERCADO_PAGO_WHATSAPP_NUMBER') # Include country code
+MERCADO_PAGO_WEBHOOK_URL = "https://agriao.shop/webhook/mercadopago/"
