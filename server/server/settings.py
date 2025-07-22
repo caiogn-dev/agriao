@@ -27,9 +27,9 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = 'django-insecure-tlkh-ov=p#81qxthjd1whw$2l06gh5h9iv#vfwn$q=0)^%#&#s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com']
+ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com', 'https://agriao.shop']
 

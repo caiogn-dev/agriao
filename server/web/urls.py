@@ -27,7 +27,10 @@ urlpatterns = [
     
     re_path(r'^imagens/(?P<path>.*)$', MediaListView.as_view(), name='media_list'),
     path('imagens/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+
+    path('buscar/', BuscaMarmitasView.as_view(), name='busca_marmitas'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

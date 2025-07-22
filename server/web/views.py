@@ -14,7 +14,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from urllib.parse import quote
-
+from django.db import models  # Adicione esta linha no início do arquivo 
 from datetime import datetime, timedelta, timezone
 import os
 from django.conf import settings
@@ -128,40 +128,6 @@ class CriarPagamentoView(LoginRequiredMixin, View):
         }
         return render(request, 'web/pagamento.html', context)
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ProdutoListView(ListView):
-    model = ProdutoMarmita
-    template_name = 'web/home.html'
-    context_object_name = 'produtos'
-    paginate_by = 5
-    queryset = ProdutoMarmita.objects.filter(ativo=True).order_by('-id')
-    
-    def post(self, request, *args, **kwargs):
-        # This is a workaround for the webhook being sent to the wrong URL.
-        # The ideal solution is to configure the correct webhook URL in Mercado Pago.
-        try:
-            notification = json.loads(request.body)
-            if notification.get('type') == 'payment':
-                payment_id = notification['data']['id']
-                
-                sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-                payment_info = sdk.payment().get(payment_id)
-                payment = payment_info["response"]
-
-                if payment.get('status') == 'approved':
-                    try:
-                        pedido = Pedido.objects.get(payment_id=payment_id)
-                        pedido.status = 'pago'
-                        pedido.save()
-                    except Pedido.DoesNotExist:
-                        # This can happen if the webhook arrives before the user is redirected
-                        # from the payment page and the Pedido is created.
-                        pass
-        except (json.JSONDecodeError, KeyError):
-            # Not a valid webhook notification, ignore it.
-            pass
-
-        return HttpResponse(status=200)
 
 class ProdutoDetailView(DetailView):
     model = ProdutoMarmita
@@ -297,5 +263,70 @@ class MercadoPagoWebhookView(View):
                 except (Pedido.DoesNotExist, ValueError, IndexError):
                     # Handle cases where the pedido is not found or description is malformed
                     pass
+
+        return HttpResponse(status=200)
+
+
+
+
+## PESQUISAR MARMITAS VIEW ## 
+class BuscaMarmitasView(ListView):
+    model = ProdutoMarmita
+    template_name = 'web/home.html'
+    context_object_name = 'produtos'
+    paginate_by = 8
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+        
+        if query:
+            return queryset.filter(
+                models.Q(nome__icontains=query) | 
+                models.Q(descricao__icontains=query),
+                ativo=True
+            ).order_by('-id')
+        return queryset.filter(ativo=True).order_by('-id')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        return context
+
+
+
+## HOME VIEW ## 
+@method_decorator(csrf_exempt, name='dispatch')
+class ProdutoListView(BuscaMarmitasView):
+    model = ProdutoMarmita
+    template_name = 'web/home.html'
+    context_object_name = 'produtos'
+    paginate_by = 5
+    queryset = ProdutoMarmita.objects.filter(ativo=True).order_by('-id')
+    
+    def post(self, request, *args, **kwargs):
+        # This is a workaround for the webhook being sent to the wrong URL.
+        # The ideal solution is to configure the correct webhook URL in Mercado Pago.
+        try:
+            notification = json.loads(request.body)
+            if notification.get('type') == 'payment':
+                payment_id = notification['data']['id']
+                
+                sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+                payment_info = sdk.payment().get(payment_id)
+                payment = payment_info["response"]
+
+                if payment.get('status') == 'approved':
+                    try:
+                        pedido = Pedido.objects.get(payment_id=payment_id)
+                        pedido.status = 'pago'
+                        pedido.save()
+                    except Pedido.DoesNotExist:
+                        # This can happen if the webhook arrives before the user is redirected
+                        # from the payment page and the Pedido is created.
+                        pass
+        except (json.JSONDecodeError, KeyError):
+            # Not a valid webhook notification, ignore it.
+            pass
 
         return HttpResponse(status=200)

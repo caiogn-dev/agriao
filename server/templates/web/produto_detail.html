@@ -9,11 +9,13 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
       
       <!-- Imagem do Produto -->
-      <div class="aspect-[4/3] w-full overflow-hidden">
+      <div class="relative pb-[66.66%]"> <!-- 3:2 aspect ratio -->
         {% if produto.imagem %}
-          <img src="/imagens/{{ produto.imagem.name }}" alt="{{ produto.name }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+          <img src="{{ produto.imagem_url_segura }}" alt="{{ produto.nome }}" 
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
         {% else %}
-          <img src="/imagens/produtos/padrao.png" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Imagem padrão">
+          <img src="{% static 'img/padrao.png' %}" alt="Imagem padrão" 
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
         {% endif %}
       </div>
       

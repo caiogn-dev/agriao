@@ -15,11 +15,17 @@
         <div class="space-y-4">
           {% for item in carrinho.itens.all %}
             <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 rounded-lg p-4 shadow-sm gap-4">
-              {% if item.produto.imagem %}
-                <img src="/imagens/{{ item.produto.imagem.name }}" alt="{{ item.produto.nome }}" class="w-full sm:w-28 h-40 object-cover rounded-md">
-              {% else %}
-                <img src="/imagens/produtos/padrao.png" alt="Imagem padrão" class="w-full sm:w-28 h-40 object-cover rounded-md">
-              {% endif %}
+              <!-- Imagem do produto - versão corrigida -->
+              <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-md overflow-hidden">
+                {% if item.produto.imagem %}
+                  <img src="{{ item.produto.imagem_url_segura }}" alt="{{ item.produto.nome }}" 
+                      class="w-full h-full object-cover">
+                {% else %}
+                  <img src="{% static 'img/padrao.png' %}" alt="Imagem padrão" 
+                      class="w-full h-full object-cover">
+                {% endif %}
+              </div>
+
 
               <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-4">
                 <div class="flex-grow">
