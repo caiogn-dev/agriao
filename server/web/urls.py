@@ -24,7 +24,7 @@ urlpatterns = [
     path('pagamento/falha/', PagamentoFalhaView.as_view(), name='pagamento_falha'),
     path('pagamento/pendente/', PagamentoPendenteView.as_view(), name='pagamento_pendente'),
     
-    path('finalizar-pedido/<int:pedido_id>/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
+    
     path('verificar-status/<int:pedido_id>/', VerificarStatusPedidoView.as_view(), name='verificar_status_pedido'),
     path('webhook/mercadopago/', mercado_pago_webhook, name='webhook_mercadopago'),
 
