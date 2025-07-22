@@ -229,7 +229,18 @@ class MeusPedidosView(LoginRequiredMixin, ListView):
     template_name = 'web/meus_pedidos.html'
     context_object_name = 'pedidos'
 
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception as e:
+            logger.exception("Erro ao listar pedidos para o usuário %s", request.user)
+            messages.error(request, "Ocorreu um erro ao carregar seus pedidos. Tente novamente mais tarde.")
+            return redirect('home')
+
     def get_queryset(self):
+        # Garante que o campo existe
+        if not hasattr(Pedido, 'criado_em'):
+            raise AttributeError("O modelo Pedido não possui o campo 'criado_em'")
         return Pedido.objects.filter(usuario=self.request.user).order_by('-criado_em')
 
 class RemoverDoCarrinhoView(LoginRequiredMixin, View):
@@ -259,34 +270,6 @@ class VerificarStatusPedidoView(LoginRequiredMixin, View):
         pedido_id = kwargs.get('pedido_id')
         pedido = get_object_or_404(Pedido, id=pedido_id, usuario=request.user)
         return JsonResponse({'status': pedido.status})
-
-@method_decorator(csrf_exempt, name='dispatch')
-class MercadoPagoWebhookView(View):
-    def post(self, request, *args, **kwargs):
-        try:
-            notification = json.loads(request.body)
-            if notification.get('type') == 'payment':
-                payment_id = notification['data']['id']
-                sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-                payment_info = sdk.payment().get(payment_id)
-                payment = payment_info["response"]
-
-                if payment['status'] == 'approved':
-                    try:
-                        description = payment.get('description', '')
-                        if description.startswith('Pedido #'):
-                            pedido_id = int(description.split('#')[1])
-                            pedido = Pedido.objects.get(id=pedido_id)
-                            pedido.status = 'pago'
-                            pedido.payment_id = payment_id
-                            pedido.save()
-                    except (Pedido.DoesNotExist, ValueError, IndexError):
-                        pass
-            return HttpResponse("OK", status=200)
-        except Exception as e:
-            # Log o erro se quiser
-            return HttpResponse("Erro no processamento", status=200)
-
 
 
 
