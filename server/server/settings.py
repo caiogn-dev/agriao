@@ -29,9 +29,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com']
+ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com', 'agriao.shop/webhook/mercadopago/']
 
-CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com', 'https://agriao.shop']
+CSRF_TRUSTED_ORIGINS = ['https://agriao-7woe.onrender.com', 'https://agriao.shop', 'https://agriao.shop/webhook/mercadopago/']
 
 
 # Application definition
@@ -64,7 +64,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'https://agriao-7woe.onrender.com',
-    'https://agriao.shop'
+    'https://agriao.shop',
+    'https://agriao.shop/webhook/mercadopago/'
 ]
 
 ROOT_URLCONF = 'server.urls'

@@ -385,18 +385,27 @@ class PagamentoPendenteView(LoginRequiredMixin, View):
 
 @csrf_exempt
 def mercado_pago_webhook(request):
-    if request.method != 'POST':
+    # 1) Handshake: aceita GET para validação
+    if request.method in ("GET", "HEAD"):
+        return HttpResponse("OK", status=200)
+
+    if request.method != "POST":
         return HttpResponse(status=405)
 
     try:
-        payload = json.loads(request.body)
-        topic = payload.get('topic') or payload.get('type')
+        # 2) Parse do JSON
+        payload = json.loads(request.body.decode('utf-8'))
+        logger.info("MP Webhook payload: %s", payload)
+
+        # 3) Identifica evento e recurso
+        action = payload.get('action') or payload.get('topic') or payload.get('type')
         resource_id = payload.get('data', {}).get('id')
 
+        # 4) Instancia SDK (token já vem de settings)
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-        # 1) Notificação de pagamento (PIX, cartão, etc)
-        if topic in ('payment', 'payment.created'):
+        # 5) Trata pagamento (PIX, cartão etc)
+        if action and 'payment' in action:
             resp = sdk.payment().get(resource_id)
             payment = resp.get('response', {})
             pedido_id = payment.get('external_reference')
@@ -413,28 +422,27 @@ def mercado_pago_webhook(request):
                         'in_mediation': 'em_mediacao',
                         'charged_back': 'estornado',
                     }
-                    novo_status = status_map.get(payment.get('status'), pedido.status)
-                    pedido.status = novo_status
+                    novo = status_map.get(payment.get('status'), pedido.status)
+                    pedido.status = novo
                     pedido.payment_id = resource_id
                     pedido.data_atualizacao = now()
                     pedido.save()
 
-        # 2) Notificação de merchant_order (caso queira consolidar vários pagamentos)
-        elif topic in ('merchant_order', 'merchant_order.created'):
+        # 6) Trata merchant_order (caso precise consolidar vários pagamentos)
+        elif action and 'merchant_order' in action:
             resp = sdk.merchant_order().get(resource_id)
             mo = resp.get('response', {})
             for pay in mo.get('payments', []):
                 ref = pay.get('external_reference')
                 pedido = Pedido.objects.filter(id=ref).first()
-                if pedido:
-                    if pay.get('status') == 'approved':
-                        pedido.status = 'aprovado'
-                        pedido.payment_id = pay.get('id')
-                        pedido.data_atualizacao = now()
-                        pedido.save()
-
-        return HttpResponse("OK", status=200)
+                if pedido and pay.get('status') == 'approved':
+                    pedido.status = 'aprovado'
+                    pedido.payment_id = pay.get('id')
+                    pedido.data_atualizacao = now()
+                    pedido.save()
 
     except Exception:
         logger.exception("Erro ao processar webhook do Mercado Pago")
-        return HttpResponse("Erro interno", status=500)
+    finally:
+        # 7) Sempre responde 200 para não ficar em loop de tentativas
+        return HttpResponse("OK", status=200)
