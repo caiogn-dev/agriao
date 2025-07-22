@@ -88,7 +88,8 @@ class CriarPagamentoView(LoginRequiredMixin, View):
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             
             # Construção das URLs
-            base_url = request.build_absolute_uri('/')[:-1]
+            base_url = request.build_absolute_uri('/')  # mantém a barra no final
+            base_url = base_url.rstrip('/')
             success_url = f"{base_url}{reverse('pagamento_sucesso')}"
             failure_url = f"{base_url}{reverse('pagamento_falha')}"
             pending_url = f"{base_url}{reverse('pagamento_pendente')}"
@@ -116,7 +117,7 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                     "failure": failure_url,
                     "pending": pending_url
                 },
-                ## "auto_return": "all", 
+                "auto_return": "approved", 
                 "external_reference": str(pedido.id),
                 "notification_url": notification_url,
                 "binary_mode": True,
