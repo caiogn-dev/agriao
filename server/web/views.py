@@ -116,7 +116,7 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                     "failure": failure_url,
                     "pending": pending_url
                 },
-                "auto_return": "all",
+                ## "auto_return": "all", 
                 "external_reference": str(pedido.id),
                 "notification_url": notification_url,
                 "binary_mode": True,
