@@ -10,7 +10,10 @@ from api.models import ProdutoMarmita, Carrinho, ItemCarrinho, Pedido, ItemPedid
 from django.conf import settings
 import mercadopago
 import json
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from urllib.parse import quote
@@ -18,8 +21,7 @@ from django.db import models  # Adicione esta linha no início do arquivo
 from datetime import datetime, timedelta, timezone
 import os
 from django.conf import settings
-from django.http import FileResponse, Http404
-from django.views import View
+from django.http import FileResponse, Http404, JsonResponse, HttpResponse
 from django.utils.encoding import smart_str
 from django.http import FileResponse
 import mimetypes
@@ -241,30 +243,29 @@ class VerificarStatusPedidoView(LoginRequiredMixin, View):
 @method_decorator(csrf_exempt, name='dispatch')
 class MercadoPagoWebhookView(View):
     def post(self, request, *args, **kwargs):
-        notification = json.loads(request.body)
-        
-        if notification['type'] == 'payment':
-            payment_id = notification['data']['id']
-            
-            sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
-            payment_info = sdk.payment().get(payment_id)
-            payment = payment_info["response"]
+        try:
+            notification = json.loads(request.body)
+            if notification.get('type') == 'payment':
+                payment_id = notification['data']['id']
+                sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+                payment_info = sdk.payment().get(payment_id)
+                payment = payment_info["response"]
 
-            if payment['status'] == 'approved':
-                try:
-                    # Use the description to find the Pedido ID
-                    description = payment.get('description', '')
-                    if description.startswith('Pedido #'):
-                        pedido_id = int(description.split('#')[1])
-                        pedido = Pedido.objects.get(id=pedido_id)
-                        pedido.status = 'pago'
-                        pedido.payment_id = payment_id # Save payment_id for reference
-                        pedido.save()
-                except (Pedido.DoesNotExist, ValueError, IndexError):
-                    # Handle cases where the pedido is not found or description is malformed
-                    pass
-
-        return HttpResponse(status=200)
+                if payment['status'] == 'approved':
+                    try:
+                        description = payment.get('description', '')
+                        if description.startswith('Pedido #'):
+                            pedido_id = int(description.split('#')[1])
+                            pedido = Pedido.objects.get(id=pedido_id)
+                            pedido.status = 'pago'
+                            pedido.payment_id = payment_id
+                            pedido.save()
+                    except (Pedido.DoesNotExist, ValueError, IndexError):
+                        pass
+            return HttpResponse("OK", status=200)
+        except Exception as e:
+            # Log o erro se quiser
+            return HttpResponse("Erro no processamento", status=200)
 
 
 
