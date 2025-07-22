@@ -102,7 +102,7 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                 "failure": request.build_absolute_uri(reverse('pagamento_falha')),
                 "pending": request.build_absolute_uri(reverse('pagamento_pendente'))
             },
-            "auto_return": "approved",  # Redireciona automaticamente após pagamento aprovado
+            "auto_return": "all",  # Redireciona automaticamente após pagamento aprovado
             "external_reference": str(pedido.id),  # Para identificar o pedido no webhook
             "notification_url": request.build_absolute_uri(reverse('webhook_mercadopago')),
         }
