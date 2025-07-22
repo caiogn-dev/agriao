@@ -26,6 +26,7 @@ from django.utils.encoding import smart_str
 from django.http import FileResponse
 import mimetypes
 from django.utils.timezone import now
+import logging
 
 
 class MediaListView(View):
@@ -53,76 +54,105 @@ class MediaListView(View):
             links.append(f'<li><a href="{url}">{f}</a></li>')
         return HttpResponse(f'<h2>Arquivos em /imagens/{path}</h2><ul>{''.join(links)}</ul>')
 
+
+logger = logging.getLogger(__name__)
+
 class CriarPagamentoView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        carrinho = get_object_or_404(Carrinho, usuario=request.user)
-        if not carrinho.itens.exists():
-            return redirect('carrinho')
+        try:
+            # 1. Validação do carrinho
+            carrinho = get_object_or_404(Carrinho, usuario=request.user)
+            if not carrinho.itens.exists():
+                return redirect('carrinho')
 
-        total = float(carrinho.get_total)
-
-        # Cria o pedido
-        pedido = Pedido.objects.create(
-            usuario=request.user,
-            total=total,
-            status='pendente'
-        )
-        for item in carrinho.itens.all():
-            ItemPedido.objects.create(
-                pedido=pedido,
-                produto=item.produto,
-                quantidade=item.quantidade,
-                preco_unitario=item.produto.preco
+            # 2. Criação do pedido
+            pedido = Pedido.objects.create(
+                usuario=request.user,
+                total=float(carrinho.get_total),
+                status='pendente'
             )
-        carrinho.itens.all().delete()
+            
+            for item in carrinho.itens.all():
+                ItemPedido.objects.create(
+                    pedido=pedido,
+                    produto=item.produto,
+                    quantidade=item.quantidade,
+                    preco_unitario=item.produto.preco
+                )
 
-        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+            # 3. Configuração do Mercado Pago
+            sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+            
+            # Construção das URLs absolutas
+            base_url = request.build_absolute_uri('/')[:-1]  # Remove a barra final
+            success_url = f"{base_url}{reverse('pagamento_sucesso')}"
+            failure_url = f"{base_url}{reverse('pagamento_falha')}"
+            pending_url = f"{base_url}{reverse('pagamento_pendente')}"
+            notification_url = f"{base_url}{reverse('webhook_mercadopago')}"
 
-        # Prepara os itens para o preference
-        items = []
-        for item in pedido.itens.all():
-            items.append({
+            # 4. Preparação dos itens
+            items = [{
                 "id": str(item.produto.id),
-                "title": item.produto.nome,
-                "quantity": item.quantidade,
+                "title": item.produto.nome[:127],  # Limita a 127 caracteres
+                "quantity": int(item.quantidade),
                 "currency_id": "BRL",
-                "unit_price": float(item.preco_unitario)
-            })
+                "unit_price": float(item.produto.preco)
+            } for item in pedido.itens.all()]
 
-        # Dados do preference
-        preference_data = {
-            "items": items,
-            "payer": {
-                "email": request.user.email,
-                "name": request.user.first_name,
-                "surname": request.user.last_name,
-            },
-            "back_urls": {
-                "success": request.build_absolute_uri(reverse('pagamento_sucesso')),
-                "failure": request.build_absolute_uri(reverse('pagamento_falha')),
-                "pending": request.build_absolute_uri(reverse('pagamento_pendente'))
-            },
-            "auto_return": "all",  # Redireciona automaticamente após pagamento aprovado
-            "external_reference": str(pedido.id),  # Para identificar o pedido no webhook
-            "notification_url": request.build_absolute_uri(reverse('webhook_mercadopago')),
-        }
+            # 5. Dados da preferência
+            preference_data = {
+                "items": items,
+                "payer": {
+                    "email": request.user.email,
+                    "name": request.user.first_name[:127],
+                    "surname": request.user.last_name[:127],
+                },
+                "back_urls": {
+                    "success": success_url,
+                    "failure": failure_url,
+                    "pending": pending_url
+                },
+                "auto_return": "all",
+                "external_reference": str(pedido.id),
+                "notification_url": notification_url,
+                "statement_descriptor": "MARMITARIA",  # Nome que aparece na fatura (13 chars max)
+                "binary_mode": True,  # Evita pagamentos pendentes
+            }
 
-        preference_response = sdk.preference().create(preference_data)
-        preference = preference_response.get("response", {})
+            logger.info(f"Enviando para MP: {preference_data}")
 
-        if preference_response.get("status") != 201:
-            pedido.status = 'falhou'
+            # 6. Criação da preferência
+            preference_response = sdk.preference().create(preference_data)
+            
+            if preference_response['status'] not in [200, 201]:
+                error_msg = preference_response.get('response', {}).get('message', 'Erro desconhecido no Mercado Pago')
+                logger.error(f"Erro MP: {error_msg}")
+                raise Exception(error_msg)
+
+            preference = preference_response['response']
+            pedido.preference_id = preference['id']
             pedido.save()
-            error_message = preference.get('message', 'Erro ao criar preferência de pagamento.')
-            return render(request, 'web/pagamento_erro.html', {'error': error_message})
 
-        # Salva o ID da preferência no pedido (opcional)
-        pedido.preference_id = preference['id']
-        pedido.save()
+            # 7. Redirecionamento seguro
+            init_point = preference.get('sandbox_init_point' if settings.DEBUG else 'init_point')
+            if not init_point:
+                raise Exception("URL de pagamento não gerada")
 
-        # Redireciona para a página de checkout do Mercado Pago
-        return redirect(preference['init_point'])
+            return redirect(init_point)
 
+        except Exception as e:
+            logger.error(f"Erro no pagamento: {str(e)}", exc_info=True)
+            
+            # Limpeza em caso de erro
+            if 'pedido' in locals():
+                pedido.status = 'falhou'
+                pedido.save()
+            
+            messages.error(request, f"Não foi possível gerar o pagamento: {str(e)}")
+            return render(request, 'web/pagamento_erro.html', {
+                'error': str(e),
+                'pedido_id': pedido.id if 'pedido' in locals() else None
+            })
 class ProdutoDetailView(DetailView):
     model = ProdutoMarmita
     template_name = 'web/produto_detail.html'
