@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Erro no Pagamento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2 class="text-danger">Ocorreu um Erro</h2>
+            <p class="lead">Não foi possível gerar o pagamento PIX.</p>
+            
+            <div class="alert alert-danger">
+                <strong>Mensagem de Erro:</strong> {{ error }}
+            </div>
+
+            <p>Isso geralmente acontece se o `MERCADO_PAGO_ACCESS_TOKEN` em seu arquivo `settings.py` for inválido ou não tiver as permissões corretas.</p>
+            <p>Por favor, verifique suas credenciais do Mercado Pago e tente novamente.</p>
+            
+            <div class="mt-4">
+                <a href="{% url 'carrinho' %}" class="btn btn-primary">Voltar para o Carrinho</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
