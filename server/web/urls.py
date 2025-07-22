@@ -26,7 +26,7 @@ urlpatterns = [
     
     path('finalizar-pedido/<int:pedido_id>/', FinalizarPedidoView.as_view(), name='finalizar_pedido'),
     path('verificar-status/<int:pedido_id>/', VerificarStatusPedidoView.as_view(), name='verificar_status_pedido'),
-    path('webhook/mercadopago/', webhook_mercadopago, name='webhook_mercadopago'),
+    path('webhook/mercadopago/', mercado_pago_webhook, name='webhook_mercadopago'),
 
     path('meus-pedidos/', MeusPedidosView.as_view(), name='meus_pedidos'),
     
