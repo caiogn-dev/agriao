@@ -24,10 +24,10 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tlkh-ov=p#81qxthjd1whw$2l06gh5h9iv#vfwn$q=0)^%#&#s'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['agriao.shop', 'agriao-7woe.onrender.com']
 
@@ -94,10 +94,9 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+        default=os.environ.get('DATABASE_URL')
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -167,3 +166,12 @@ AUTHENTICATION_BACKENDS = [
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
 MERCADO_PAGO_WHATSAPP_NUMBER = os.environ.get('MERCADO_PAGO_WHATSAPP_NUMBER') # Include country code
 MERCADO_PAGO_WEBHOOK_URL = "https://agriao.shop/webhook/mercadopago/"
+
+
+# for deployment
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

@@ -90,11 +90,6 @@ class CriarPagamentoView(LoginRequiredMixin, View):
             # Construção das URLs
             base_url = request.build_absolute_uri('/')  # mantém a barra no final
             base_url = base_url.rstrip('/')
-            success_url = f"{base_url}{reverse('pagamento_sucesso')}"
-            failure_url = f"{base_url}{reverse('pagamento_falha')}"
-            pending_url = f"{base_url}{reverse('pagamento_pendente')}"
-            notification_url = f"{base_url}{reverse('webhook_mercadopago')}"
-
             # 4. Itens do pedido
             items = [{
                 "id": str(item.produto.id),
@@ -113,13 +108,13 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                     "surname": request.user.last_name[:127],
                 },
                 "back_urls": {
-                    "success": success_url,
-                    "failure": failure_url,
-                    "pending": pending_url
+                    "success": request.build_absolute_uri(reverse('pagamento_sucesso')),
+                    "failure": request.build_absolute_uri(reverse('pagamento_falha')),
+                    "pending": request.build_absolute_uri(reverse('pagamento_pendente')),
                 },
-                "auto_return": "approved", 
+                "auto_return": "approved",  # Corrigido aqui
                 "external_reference": str(pedido.id),
-                "notification_url": notification_url,
+                "notification_url": request.build_absolute_uri(reverse('webhook_mercadopago')),
                 "binary_mode": True,
             }
 
