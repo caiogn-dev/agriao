@@ -1,30 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Meus Pedidos</h1>
+  <h1 class="text-3xl font-futura font-bold text-primary mb-6">Meus Pedidos</h1>
 
   {% for pedido in pedidos %}
-    <div class="pedido">
-      <h2>Pedido #{{ pedido.id }} – {{ pedido.criado_em|date:"d/m/Y H:i" }}</h2>
-      <p>Status: {{ pedido.status }}</p>
-      <p>Total: R$ {{ pedido.total }}</p>
-      <ul>
+    <div class="bg-white rounded-xl shadow-neumorphic p-6 mb-8 hover-scale">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+        <h2 class="text-xl font-semibold">Pedido #{{ pedido.id }}</h2>
+        <span class="text-gray-500 text-sm">{{ pedido.criado_em|date:"d/m/Y H:i" }}</span>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:justify-between mb-4">
+        <div>
+          <span class="font-medium">Total:</span>
+          <span class="text-lg font-semibold">R$ {{ pedido.total }}</span>
+        </div>
+        <div>
+          {% if pedido.status == 'aprovado' %}
+            <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Aprovado</span>
+          {% elif pedido.status == 'pendente' %}
+            <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Pendente</span>
+          {% elif pedido.status == 'falhou' or pedido.status == 'rejected' %}
+            <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">Falhou</span>
+          {% else %}
+            <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">{{ pedido.status|capfirst }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <ul class="divide-y divide-gray-200">
         {% for item in pedido.itens.all %}
-          <li>{{ item.quantidade }}× {{ item.produto.nome }} — R$ {{ item.preco_unitario }}</li>
+          <li class="py-3 flex justify-between items-center">
+            <span class="font-medium">{{ item.quantidade }}× {{ item.produto.nome }}</span>
+            <span class="text-gray-600">R$ {{ item.preco_unitario }}</span>
+          </li>
         {% endfor %}
       </ul>
+
+      <div class="mt-4 text-right">
+        <a href="{% url 'finalizar_pedido' pedido_id=pedido.id %}"
+           class="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary-950 transition">
+          Ver Detalhes
+        </a>
+      </div>
     </div>
   {% empty %}
-    <p>Você ainda não fez nenhum pedido.</p>
+    <div class="glass-effect bg-white rounded-lg p-6 text-center text-gray-600">
+      <p class="font-medium">Você ainda não fez nenhum pedido.</p>
+    </div>
   {% endfor %}
 
   {% if is_paginated %}
-    <nav>
+    <nav class="flex justify-center items-center space-x-4 mt-6">
       {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">&laquo; anterior</a>
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="px-3 py-1 bg-white shadow-sm rounded-md hover:bg-gray-100 transition">
+          &laquo; Anterior
+        </a>
       {% endif %}
-      <span>página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      <span class="text-gray-600">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">próxima &raquo;</a>
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="px-3 py-1 bg-white shadow-sm rounded-md hover:bg-gray-100 transition">
+          Próxima &raquo;
+        </a>
       {% endif %}
     </nav>
   {% endif %}
