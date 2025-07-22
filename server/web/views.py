@@ -108,9 +108,9 @@ class CriarPagamentoView(LoginRequiredMixin, View):
                     "surname": request.user.last_name[:127],
                 },
                 "back_urls": {
-                    "success": request.build_absolute_uri(reverse('pagamento_sucesso')),
-                    "failure": request.build_absolute_uri(reverse('pagamento_falha')),
-                    "pending": request.build_absolute_uri(reverse('pagamento_pendente')),
+                    "success": "https://agriao.shop/pagamento/sucesso/",
+                    "failure": "https://agriao.shop/pagamento/falha/",
+                    "pending": "https://agriao.shop/pagamento/pendente/",
                 },
                 "auto_return": "approved",  # Corrigido aqui
                 "external_reference": str(pedido.id),
